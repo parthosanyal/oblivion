@@ -1,0 +1,44 @@
+#### On-Prem Monitoring Jobs ####
+
+#*/10 * * * * sh /opt/denodo/solutionmanager_8/util/server_health_node.sh ODEV1 Denodo-Support@gsk.com /opt/denodo/solutionmanager_8/util/monitor_config > /opt/denodo/solutionmanager_8/util/monitor_script_logs/monitor_script_log_ODEV1 2>/opt/denodo/solutionmanager_8/util/errorfile
+
+#*/10 * * * * sh /opt/denodo/solutionmanager_8/util/server_health_node.sh ODEV2 Denodo-Support@gsk.com /opt/denodo/solutionmanager_8/util/monitor_config > /opt/denodo/solutionmanager_8/util/monitor_script_logs/monitor_script_log_ODEV2 2>/opt/denodo/solutionmanager_8/util/errorfile
+
+#*/10 * * * * sh /opt/denodo/solutionmanager_8/util/server_health_node.sh ODEV3 Denodo-Support@gsk.com /opt/denodo/solutionmanager_8/util/monitor_config > /opt/denodo/solutionmanager_8/util/monitor_script_logs/monitor_script_log_ODEV3 2>/opt/denodo/solutionmanager_8/util/errorfile
+
+#*/10 * * * * sh /opt/denodo/solutionmanager_8/util/server_health_serv.sh ODEVS Denodo-Support@gsk.com /opt/denodo/solutionmanager_8/util/monitor_config > /opt/denodo/solutionmanager_8/util/monitor_script_logs/monitor_script_log_ODEVS 2>/opt/denodo/solutionmanager_8/util/errorfile
+
+* 1 * * * sh /opt/denodo/solutionmanager_8/util/copy_logs_to_shared_folder.sh
+
+#### Azure Monitoring Jobs #####
+
+#*/50 * * * * sh /opt/denodo/solutionmanager_8/util/server_health_node.sh ADEV1 Denodo-Support@gsk.com /opt/denodo/solutionmanager_8/util/monitor_config > /opt/denodo/solutionmanager_8/util/monitor_script_logs/monitor_script_log_ADEV1 2>/opt/denodo/solutionmanager_8/util/errorfile
+
+#*/10 * * * * sh /opt/denodo/solutionmanager_8/util/server_health_node.sh ADEV2 Denodo-Support@gsk.com /opt/denodo/solutionmanager_8/util/monitor_config > /opt/denodo/solutionmanager_8/util/monitor_script_logs/monitor_script_log_ADEV2 2>/opt/denodo/solutionmanager_8/util/errorfile
+
+#*/10 * * * * sh /opt/denodo/solutionmanager_8/util/server_health_node.sh ADEV3 Denodo-Support@gsk.com /opt/denodo/solutionmanager_8/util/monitor_config > /opt/denodo/solutionmanager_8/util/monitor_script_logs/monitor_script_log_ADEV3 2>/opt/denodo/solutionmanager_8/util/errorfile
+
+#*/10 * * * * sh /opt/denodo/solutionmanager_8/util/server_health_serv.sh ADEVS Denodo-Support@gsk.com /opt/denodo/solutionmanager_8/util/monitor_config > /opt/denodo/solutionmanager_8/util/monitor_script_logs/monitor_script_log_ADEVS 2>/opt/denodo/solutionmanager_8/util/errorfile
+
+#### On-Prem Health Jobs (Monitoring Views) . ####
+
+#*/10 * * * * sh /opt/denodo/solutionmanager_8/util/server_health_to_log.sh ODEV1 /dev_onprem_vdp1_health.log /opt/denodo/solutionmanager_8/util/monitor_config >/dev/null 2>&1
+
+#*/10 * * * * sh /opt/denodo/solutionmanager_8/util/server_health_to_log.sh ODEV2 /dev_onprem_vdp2_health.log /opt/denodo/solutionmanager_8/util/monitor_config >/dev/null 2>&1
+
+#*/10 * * * * sh /opt/denodo/solutionmanager_8/util/server_health_to_log.sh ODEV3 /dev_onprem_vdp3_health.log /opt/denodo/solutionmanager_8/util/monitor_config >/dev/null 2>&1
+
+#### Azure Health Jobs (Monitoring Views) ####
+
+#*/10 * * * * sh /opt/denodo/solutionmanager_8/util/server_health_to_log.sh ADEV1 /dev_azure_vdp1_health.log /opt/denodo/solutionmanager_8/util/monitor_config >/dev/null 2>&1
+
+#*/10 * * * * sh /opt/denodo/solutionmanager_8/util/server_health_to_log.sh ADEV2 /dev_azure_vdp2_health.log /opt/denodo/solutionmanager_8/util/monitor_config >/dev/null 2>&1
+
+#*/10 * * * * sh /opt/denodo/solutionmanager_8/util/server_health_to_log.sh ADEV3 /dev_azure_vdp3_health.log /opt/denodo/solutionmanager_8/util/monitor_config >/dev/null 2>&1
+
+#### Delete Old Log Jobs ####
+
+0 0 * * * sh /opt/denodo/solutionmanager_8/util/delete_old_logs.sh > /opt/denodo/solutionmanager_8/util/monitor_script_logs/delete_old_logs.log 2>&1
+
+#### Copy logs from SM to Shared Folder ####
+#15 0 * * * sh /opt/denodo/solutionmanager_8/util/copy_logs_to_shared_folder.sh >/dev/null 2>&1
