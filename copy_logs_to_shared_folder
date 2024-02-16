@@ -1,0 +1,77 @@
+#!/bin/bash
+
+FROM=/opt/denodo/solutionmanager_8/monitor/logs/
+PREOP=dev_onprem_vdp
+PREAZ=dev_azure_vdp
+TOONPREM=/RD/DataInterfaces/SolMgr_Logs/ODev/
+TOAZURE=/RD/DataInterfaces/SolMgr_Logs/ADev/
+QUERIESLOG=-queries.log
+QUERYBLOCKSLOG=-queryblocks.log
+RESOURCESLOG=-resources.log
+HEALTHLOG=_health.log
+
+ONEDAYAGO=".$(date --date '-1 day' '+%Y-%m-%d')"
+TWODAYSAGO=".$(date --date '-2 day' '+%Y-%m-%d')"
+THREEDAYSAGO=".$(date --date '-3 day' '+%Y-%m-%d')"
+FOURDAYSAGO=".$(date --date '-4 day' '+%Y-%m-%d')"
+FIVEDAYSAGO=".$(date --date '-5 day' '+%Y-%m-%d')"
+SIXDAYSAGO=".$(date --date '-6 day' '+%Y-%m-%d')"
+SEVENDAYSAGO=".$(date --date '-7 day' '+%Y-%m-%d')"
+
+for NODE in 1 2 3
+do
+    for ENV in $PREOP $PREAZ
+    do
+        if [[ "$ENV" == "$PREOP" ]]; then
+            TO=$TOONPREM
+        else
+            TO=$TOAZURE
+        fi
+        FILERESOURCES=$FROM$ENV$NODE$RESOURCESLOG$ONEDAYAGO
+        if [[ -f $FILERESOURCES ]]; then
+            cp $FILERESOURCES $TO$ENV$NODE$RESOURCESLOG
+        fi
+		
+        FILEQUERY=$FROM$ENV$NODE$QUERIESLOG$ONEDAYAGO
+        if [[ -f $FILEQUERY ]]; then
+            cp $FILEQUERY $TO$ENV$NODE$QUERIESLOG
+        fi
+
+## New Section Added ##
+	FILEQUERYBLOCKS=$FROM$ENV$NODE$QUERYBLOCKSLOG$ONEDAYAGO
+	if [[ -f $FILEQUERYBLOCKS ]];then
+	    cp $FILEQUERYBLOCKS $TO$ENV$NODE$QUERYBLOCKSLOG
+	fi
+## New Section Added ##
+
+        FILEHEALTH=$FROM$ENV$NODE$HEALTHLOG
+        if [[ -f $FILEHEALTH ]]; then
+            cp $FILEHEALTH $TO$ENV$NODE$HEALTHLOG
+        fi
+
+        for DAY in $TWODAYSAGO $THREEDAYSAGO $FOURDAYSAGO $FIVEDAYSAGO $SIXDAYSAGO $SEVENDAYSAGO
+        do
+            if [[ "$ENV" == "$PREOP" ]]; then
+                TO=$TOONPREM
+            else
+                TO=$TOAZURE
+            fi
+            FILEQUERY=$FROM$ENV$NODE$RESOURCESLOG$DAY
+            if [[ -f $FILEQUERY ]]; then
+                cp $FILEQUERY $TO
+            fi
+## New Section Added ##
+	    FILEQUERYBLOCKS=$FROM$ENV$NODE$QUERYBLOCKSLOG$DAY
+	    if [[ -f $FILEQUERYBLOCKS ]]; then
+		cp $FILEQUERYBLOCKS $TO
+            fi
+## New Section Added ##
+
+            FILERESOURCES=$FROM$ENV$NODE$QUERIESLOG$DAY
+            if [[ -f $FILERESOURCES ]]; then
+                cp $FILERESOURCES $TO
+            fi
+        done
+    done
+done
+
