@@ -1,0 +1,350 @@
+#!/bin/bash
+environment="$1"
+email_id="$2"
+filename="$3"
+retval=5
+vqlExecOutput=
+outputStatus=0
+outputText=
+serverName=
+serverHostName=
+curlOutput=0
+curlOutputDC=0
+emailStatus=
+initialEmailStatus=
+denodoHome=
+tomcatMemory=
+n=7
+memoryExtract=
+totalMemory=
+usedMemory=
+thresholdMessage=
+retMessage=
+password=
+tomcatLogLocation=
+sc_dc_hostname=
+logLastUpdateTime=
+now=
+timeDifference=
+o_p_stat=
+
+#Function to assign environment variables
+assign_variables()
+{
+	while read -r line
+	do
+		IFS=';' read -ra arr3 <<< "$line"
+		if [ $environment == ${arr3[0]} ]
+		then
+			serverName=${arr3[1]}
+			serverHostName=${arr3[2]}
+			denodoHome=${arr3[3]}
+			password=${arr3[4]}
+			tomcatLogLocation=${arr3[5]}
+                        sc_dc_hostname=${arr3[6]}
+			echo ${arr3[1]}
+			break
+		fi
+	done < "$filename"
+}
+
+#Function to login to the VDP server(admin VDB) using Denodo's ping script and execute a query to verify if the VDB server is up and functioning
+vdp_query_execution_check()
+{
+	echo "Checking Query execution"
+	${denodoHome}/bin/ping.sh -t 600000 -q "select 1 from dual()" -l ping -p admin //${serverHostName}:9999/admin
+	retval=$?
+	echo Script returned value:$retval
+	if [ $retval -eq 0 ]
+	then
+	  outputText="VDP Node Status: UP.
+	"
+	else
+	  outputText="VDP Node Status: DOWN.
+	"
+	  outputStatus=$((outputStatus+1))
+	fi
+}
+#Function to hit a dummy API that has been created in the environment to check if the API is returning 200 http response. This is to verify our webservices/web container is up and running
+api_execution_check()
+{
+	echo "Checking API execution"
+	curlOutput=$(curl --write-out "%{http_code}\n" --silent --output /dev/null -m 600 "https://${sc_dc_hostname}:9443/denodo-design-studio/#/server/admin/ping_query_view/views/ping_query_view")
+	echo Curl Output is: $curlOutput
+	if [ $curlOutput -eq 200 ]
+	then 
+	  outputText="${outputText}
+API execution: Successful. Output code: ${curlOutput}
+	"
+	else
+	  outputText="${outputText}
+API execution: Failed. Output code: ${curlOutput}
+	"
+	  outputStatus=$((outputStatus+1))
+	fi
+}
+
+#Function to hit the scheduler port using Denodo's ping script to verify if the port is open and accepting connections
+scheduler_port_check()
+{
+	#retval=5
+	echo "Checking scheduler is alive"
+	retMessage=$(${denodoHome}/tools/scheduler/ping.sh -m 60000 -v -h ${sc_dc_hostname})
+	retval=$?
+	echo $retMessage
+#	retval=$?
+	echo Script returned value:$retval
+	if [ $retval -eq  0 ]
+	then
+	  outputText="${outputText}
+Scheduler Service Status: Alive.
+Output: ${retMessage}
+	"
+	else
+	  outputText="${outputText}	
+Scheduler Service Status: Down.
+Output: ${retMessage}
+	"
+	  outputStatus=$((outputStatus+1))
+	fi
+}
+
+#Function to hit the Data Catalog API (ping endpoint) to check if it is working
+data_catalog_endpoint_check()
+{
+	echo "Checking Data Catlog is alive"
+	curlOutputDC=$(curl --write-out "%{http_code}\n" --silent --output /dev/null -m 600 "https://${sc_dc_hostname}:9443/denodo-data-catalog/#/Ping")
+	echo Data Catalog Curl Output is: $curlOutputDC
+	if [ $curlOutputDC -eq 200 ]
+	then
+	  outputText="${outputText}
+Data Catalog Service Status: Alive. Output code: ${curlOutputDC}
+	"
+	else
+	  outputText="${outputText}
+Data Catalog Service Status: Down. Output code: ${curlOutputDC}
+	"
+	  outputStatus=$((outputStatus+1))
+	fi
+}
+
+#Function to read tomcat monitoriing log and check current memory usage percentage. Send ALERT if memory usage is higher than 75%
+tomcat_memory_check()
+{
+	tomcatMemory=$(tail -n 1 ${tomcatLogLocation}/${serverName}-resources.log)
+	arr=($tomcatMemory)
+	memoryExtract=${arr[n-1]}
+	echo $memoryExtract
+	IFS='/' read -ra arr2 <<< "$memoryExtract"
+	usedMemory=$((${arr2[0]}/1024/1024))
+	totalMemory=$((${arr2[1]}/1024/1024))
+	echo Total Tomcat Memory: $totalMemory
+	echo Used Tomcat Memory: $usedMemory
+	percent=$((100*${usedMemory}/${totalMemory}))
+	echo Percentage: $percent
+	logLastUpdateTime="$(stat -c %Y ${tomcatLogLocation}/${serverName}-resources.log)"
+	now="$(date +%s)"
+	timeDifference=$((${now}-${logLastUpdateTime}))
+	if [ "$percent" -ge 92 ]
+	then
+	  if [ "$timeDifference" -ge 600 ]
+	  then
+		thresholdMessage=" but Monitoring Logs (Resources) not updated for more than 10 min"
+                o_p_stat=1
+	  else
+	  	thresholdMessage=" and Resources threshold Crossed"
+              	o_p_stat=1
+	  fi
+	  outputText="${outputText}
+Tomcat Log Last Update Time: $(date -r ${tomcatLogLocation}/${serverName}-resources.log)
+
+Tomcat Total Memory: ${totalMemory} MB
+Tomcat Used Memory: ${usedMemory} MB
+Tomcat Memory Used Percentage: ${percent}
+ALERT! Tomcat Memory Usage higher than Threshold
+	"
+	  initialEmailStatus="ALERT"
+	else
+	if [ "$timeDifference" -ge 600 ]
+          then
+                thresholdMessage=" but Monitoring Logs (Resources) not updated for more than 10 min"
+		initialEmailStatus="ALERT"
+		o_p_stat=1
+          else
+	  	thresholdMessage=" and Resources are in below threshold"
+		o_p_stat=0
+	  fi
+	  outputText="${outputText}
+Tomcat Log Last Update Time: $(date -r ${tomcatLogLocation}/${serverName}-resources.log)
+
+Tomcat Total Memory: ${totalMemory} MB
+Tomcat Used Memory: ${usedMemory} MB
+Tomcat Memory Used Percentage: ${percent}
+Tomcat Memory Usage is FINE
+	"
+	fi
+}
+
+#Send mail with status
+#compose_and_send_email()
+#{
+#	echo TEXT: $outputText
+#	echo EMAIL STATUS: $emailStatus
+#	echo INITIAL EMAIL STATUS: $initialEmailStatus
+#	{	
+#	echo "From: DenodoMonitoring@gsk.com"
+#	#echo "To: dps-datainterfaces@gsk.com"
+#        #echo "To: hardikkumar.8.patel@gsk.com"
+#	#echo "To: partho.x.sanyal@gsk.com"
+#        #echo "To: shreyansh.x.shreyansh@gsk.com"
+#        echo "To: ${email_id}"
+#        #echo "To: aneesh.x.babu@gsk.com"
+
+#	if [ "$initialEmailStatus" == "ALERT" ]
+#	then
+#          {
+#          echo TEXT: $outputText
+#          echo EMAIL STATUS: $emailStatus
+#          echo INITIAL EMAIL STATUS: $initialEmailStatus
+         # {
+    #      echo "From: DenodoMonitoring@gsk.com"
+          #echo "To: dps-datainterfaces@gsk.com"
+          #echo "To: hardikkumar.8.patel@gsk.com"
+          #echo "To: partho.x.sanyal@gsk.com"
+          #echo "To: shreyansh.x.shreyansh@gsk.com"
+   #       echo "To: ${email_id}"
+          ##echo "To: aneesh.x.babu@gsk.com"
+	  #echo "Importance:High"
+          #echo "Subject:${initialEmailStatus} : ${serverName} Status is ${emailStatus} ${thresholdMessage}" |  echo "${outputText}"          | 
+ #          mailx -s  "Importance:High"
+  #         "Subject:${initialEmailStatus} : ${serverName} Status is ${emailStatus} ${thresholdMessage} ${outputText}" ${email_id}  
+
+#	echo "Subject:${initialEmailStatus} : ${serverName} Status is ${emailStatus} ${thresholdMessage}"
+#	echo "${outputText}"
+#	} #| /usr/sbin/sendmail -t
+ #       }
+ #       fi # | /usr/sbin/sendmail -t
+#} #/usr/sbin/sendmail -t
+
+#compose_and_send_email()
+#{
+#        echo TEXT: $outputText
+ #       echo EMAIL STATUS: $emailStatus
+ #       echo INITIAL EMAIL STATUS: $initialEmailStatus
+ #       {
+ #       echo "From: DenodoMonitoring@gsk.com"
+        #echo "To: dps-datainterfaces@gsk.com"
+        #echo "To: hardikkumar.8.patel@gsk.com"
+        #echo "To: partho.x.sanyal@gsk.com"
+        #echo "To: shreyansh.x.shreyansh@gsk.com"
+ #       echo "To: ${email_id}"
+        #echo "To: aneesh.x.babu@gsk.com"
+
+  #      if [ "$initialEmailStatus" == "ALERT" ]
+  #      then
+  #        echo "Importance:High"
+  #        echo "Subject:${initialEmailStatus} : ${serverName} Status is ${emailStatus} ${thresholdMessage}"
+  #        echo "${outputText}"
+  #      fi
+  #      echo "Subject:${initialEmailStatus} : ${serverName} Status is ${emailStatus} ${thresholdMessage}"
+ #       echo "${outputText}"
+  #      } | /usr/sbin/sendmail -t
+#}
+
+compose_and_send_email()
+{
+
+if [ "$initialEmailStatus" == "ALERT" ]
+        then
+         # /usr/sbin/sendmail -t #${email_id}
+         # From: DenodoMonitoring@gsk.com
+         # To: ${email_id}
+
+          echo TEXT: $outputText
+          echo EMAIL STATUS: $emailStatus
+          echo INITIAL EMAIL STATUS: $initialEmailStatus
+          {
+          echo "From: DenodoMonitoring@gsk.com"
+          echo "To: ${email_id}"
+          echo "Importance:High"
+          echo "Subject:${initialEmailStatus} : ${serverName} Status is ${emailStatus}"
+          echo "${outputText}"
+          }| /usr/sbin/sendmail -t
+        fi
+
+}
+
+compose_and_send_email_cross_threshold()
+{
+ #       echo TEXT: $outputText
+ #       echo EMAIL STATUS: $emailStatus
+ #       echo INITIAL EMAIL STATUS: $initialEmailStatus
+        #/usr/sbin/sendmail ${email_id}
+#        echo "From: DenodoMonitoring@gsk.com"
+        #echo "To: dps-datainterfaces@gsk.com"
+        #echo "To: hardikkumar.8.patel@gsk.com"
+        #echo "To: partho.x.sanyal@gsk.com"
+        #echo "To: shreyansh.x.shreyansh@gsk.com"
+ #       echo "To: ${email_id}"
+        #echo "To: aneesh.x.babu@gsk.com"
+        #/usr/sbin/sendmail ${email_id}
+
+       if [ "$initialEmailStatus" == "ALERT" ]
+        then
+         # /usr/sbin/sendmail -t #${email_id}
+         # From: DenodoMonitoring@gsk.com
+         # To: ${email_id}
+
+          echo TEXT: $outputText
+          echo EMAIL STATUS: $emailStatus
+          echo INITIAL EMAIL STATUS: $initialEmailStatus
+          {
+          echo "From: DenodoMonitoring@gsk.com"
+          echo "To: ${email_id}"
+          echo "Importance:High"
+          echo "Subject:${initialEmailStatus} : ${serverName} Status is ${emailStatus} ${thresholdMessage}"
+          echo "${outputText}"
+          }| /usr/sbin/sendmail -t
+        fi
+     #  /usr/sbin/sendmail -t
+  #      echo "Subject:${initialEmailStatus} : ${serverName} Status is ${emailStatus} ${thresholdMessage}"
+ #       echo "${outputText}"
+         # /usr/sbin/sendmail -t
+}
+assign_variables
+echo Checking $serverName
+vdp_query_execution_check
+#api_execution_check
+#scheduler_port_check
+#data_catalog_endpoint_check
+
+echo STATUS: $outputStatus
+case $outputStatus in
+        "0")
+                emailStatus="GREEN"
+                initialEmailStatus="ALL-OK"
+                ;;
+        "1")
+                emailStatus="RED"
+                initialEmailStatus="ALERT"
+esac
+
+#tomcat_memory_check
+#compose_and_send_email
+compose_and_send_email_actual()
+{
+if [ $o_p_stat -eq 0 ]
+then
+   compose_and_send_email
+
+else
+   compose_and_send_email_cross_threshold
+fi
+}
+
+
+
+tomcat_memory_check
+compose_and_send_email_actual
+echo "End of Status monitoring Script"
+
