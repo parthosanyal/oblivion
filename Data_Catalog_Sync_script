@@ -1,0 +1,108 @@
+#!/bin/bash
+environment="$1"
+email_id="$2"
+filename="$3"
+outputText1=
+outputText2=
+serverName=
+serverHostName=
+curlOutput=0
+#dc_password=
+#env_host=
+o_p_stat=
+
+
+#Function to assign environment variables
+
+ASSIGN_VARIABLES()
+{
+	while read -r line
+	do
+		IFS=';' read -ra arr3 <<< "$line"
+		if [ $environment == ${arr3[0]} ]
+		then
+			serverName=${arr3[1]}
+			serverHostName=${arr3[2]}
+#			dc_password=${arr3[9]}
+#			env_host=${arr3[10]}
+			echo ${arr3[1]}
+			break
+		fi
+	done < "$filename"
+}
+
+
+# Function for Data_Catalog_Metadata_Sync 
+DATA_CATALOG_METADATA_SYNC()
+{
+
+	echo Curl Output is: $curlOutput
+	if [ $curlOutput -eq 200 ]
+	then 
+	  outputText1="
+Data-Catalog Sync: Successful. Output code: ${curlOutput}
+	"
+	  o_p_stat=0
+	else
+	  outputText2="
+Data-Catalog Sync: Failed. Output code: ${curlOutput}
+	"
+	  o_p_stat=1
+	 
+	fi
+}
+
+
+#Function for Environment_Choices
+ENVIRONMENT_CHOICES()
+
+{
+
+	if [[ $environment == "ODEVS" ]]; then
+
+                curlOutput=$(curl --write-out "%{http_code}\n" --silent --output /dev/null -m 1200 -X POST "https://denodous-services-dev.gsk.com:9443/denodo-data-catalog/apirest/synchronize?serverId=1&uri=%2F%2Fdenodous-dev.gsk.com%3A9999%2Fadmin" -H "accept: application/json" -H "authorization: Basic YWRtaW46VkJlS1stJX1ELg==" -H "Content-Type: application/json" -d "{ \"allServers\": true, \"priority\": \"server\", \"serverName\": \"denodous-dev.gsk.com\", \"type\": \"all\"}")
+		DATA_CATALOG_METADATA_SYNC
+		
+	elif [[ $environment == "ADEVS" ]]; then
+
+               	curlOutput=$(curl --write-out "%{http_code}\n" --silent --output /dev/null -m 1200  -X POST "https://denodo-eus2-services-dev.gsk.com:9443/denodo-data-catalog/apirest/synchronize?serverId=3&uri=%2F%2Fdenodo-eus2-dev.gsk.com%3A9999%2Fadmin" -H "accept: application/json" -H "authorization: Basic YWRtaW46VkJlS1stJX1ELg==" -H "Content-Type: application/json" -d "{ \"allServers\": true, \"priority\": \"server\", \"serverName\": \"denodo-eus2-dev.gsk.com\", \"type\": \"all\"}")
+		DATA_CATALOG_METADATA_SYNC
+
+	elif [[ $environment == "OTESTS" ]]; then
+
+		curlOutput=$(curl --write-out "%{http_code}\n" --silent --output /dev/null -m 1200 -X POST "https://denodous-services-test.gsk.com:9443/denodo-data-catalog/apirest/synchronize?serverId=1&uri=%2F%2Fdenodous-test.gsk.com%3A9999%2Fadmin" -H "accept: application/json" -H "authorization: Basic YWRtaW46IjM4bUE4Jng1cA==" -H "Content-Type: application/json" -d "{ \"allServers\": true, \"priority\": \"server\", \"serverName\": \"Denodo TEST On-Prem\", \"type\": \"all\"}")
+                DATA_CATALOG_METADATA_SYNC
+
+	elif [[ $environment == "ATESTS" ]]; then
+
+		curlOutput=$(curl --write-out "%{http_code}\n" --silent --output /dev/null -m 1200 -X POST "https://denodo-eus2-services-test.gsk.com:9443/denodo-data-catalog/apirest/synchronize?serverId=1&uri=%2F%2Fdenodo-eus2-test.gsk.com%3A9999%2Fadmin" -H "accept: application/json" -H "authorization: Basic YWRtaW46IjM4bUE4Jng1cA==" -H "Content-Type: application/json" -d "{ \"allServers\": true, \"priority\": \"server\", \"serverName\": \"Denodo TEST Azure\", \"type\": \"all\"}")
+		DATA_CATALOG_METADATA_SYNC
+        
+        fi
+
+}
+
+#Function for Compose_And_Send_Email it is going to send, when it encounters ERROR or o_p_stat == 1 
+COMPOSE_AND_SEND_EMAIL()
+
+{
+
+   if [ $o_p_stat == 1 ]
+        then
+ 
+          echo TEXT: $outputText2
+          {
+          echo "From: DenodoMonitoring@gsk.com"
+          echo "To: ${email_id}"
+          echo "Importance:High"
+          echo "Subject:"FAILURE" : ${serverName}"
+          echo "${outputText2}"
+          }| /usr/sbin/sendmail -t
+        fi
+}
+
+ASSIGN_VARIABLES
+ENVIRONMENT_CHOICES
+COMPOSE_AND_SEND_EMAIL
+
+
