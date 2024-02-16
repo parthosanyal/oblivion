@@ -1,0 +1,127 @@
+#!/bin/bash
+
+#DENODO=/opt/denodo/denodo_8
+
+export v_exportmetadata_datetime=$(date '+%Y%m%d_%H%M')
+export v_exportmetadata_email=Denodo-Support@gsk.com
+#export v_exportmetadata_path_vdp=/RD/DataInterfaces/ha/export/dev/onprem/vdp1
+#export v_exportmetadata_path_vdp=/RD/DataInterfaces/ha/export/dev/onprem/vdp2
+#export v_exportmetadata_path_vdp=/RD/DataInterfaces/ha/export/dev/onprem/vdp3
+#export v_exportmetadata_path_vdp=/RD/DataInterfaces/ha/export/dev/azure/vdp1
+#export v_exportmetadata_path_vdp=/RD/DataInterfaces/ha/export/dev/azure/vdp2
+#export v_exportmetadata_path_vdp=/RD/DataInterfaces/ha/export/dev/azure/vdp3
+#export v_exportmetadata_path_vdp=/RD/DataInterfaces/ha/export/test/onprem/vdp1
+#export v_exportmetadata_path_vdp=/RD/DataInterfaces/ha/export/test/onprem/vdp2
+#export v_exportmetadata_path_vdp=/RD/DataInterfaces/ha/export/test/onprem/vdp3
+#export v_exportmetadata_path_vdp=/RD/DataInterfaces/ha/export/test/azure/vdp1
+#export v_exportmetadata_path_vdp=/RD/DataInterfaces/ha/export/test/azure/vdp2
+#export v_exportmetadata_path_vdp=/RD/DataInterfaces/ha/export/test/azure/vdp3
+#export v_exportmetadata_path_vdp=/RD/DataInterfaces/ha/export/prod/onprem/vdp1
+#export v_exportmetadata_path_vdp=/RD/DataInterfaces/ha/export/prod/onprem/vdp2
+#export v_exportmetadata_path_vdp=/RD/DataInterfaces/ha/export/prod/onprem/vdp3
+#export v_exportmetadata_path_vdp=/RD/DataInterfaces/ha/export/prod/azure/vdp1
+#export v_exportmetadata_path_vdp=/RD/DataInterfaces/ha/export/prod/azure/vdp2
+#export v_exportmetadata_path_vdp=/RD/DataInterfaces/ha/export/prod/azure/vdp3
+
+export v_exportmetadata_path_services=/RD/DataInterfaces/ha/export/dev/onprem/services
+#export v_exportmetadata_path_services=/RD/DataInterfaces/ha/export/dev/azure/services
+#export v_exportmetadata_path_services=/RD/DataInterfaces/ha/export/test/onprem/services
+#export v_exportmetadata_path_services=/RD/DataInterfaces/ha/export/test/azure/services
+#export v_exportmetadata_path_services=/RD/DataInterfaces/ha/export/prod/onprem/services
+#export v_exportmetadata_path_services=/RD/DataInterfaces/ha/export/prod/azure/services
+
+#VDP node metadata export
+if [[ -z $v_exportmetadata_path_vdp ]]; then
+	echo "VDP path where are you"
+else
+	#Denodo DEV, TEST or PROD environment
+	if [[ $v_exportmetadata_path_vdp == *dev* ]]; then
+		export v_exportmetadata_env=DEV
+	elif [[ $v_exportmetadata_path_vdp == *test* ]]; then
+		export v_exportmetadata_env=TEST
+	else
+		export v_exportmetadata_env=PROD
+	fi
+	echo $v_exportmetadata_env
+
+	#Denodo onprem or azure environment
+	if [[ $v_exportmetadata_path_vdp == *onprem* ]]; then
+		export v_exportmetadata_azure_onprem=OnPrem
+	else
+		export v_exportmetadata_azure_onprem=Azure
+	fi
+	echo $v_exportmetadata_azure_onprem
+
+	#VDP node 1, 2 or 3
+	if [[ $v_exportmetadata_path_vdp == *1* ]]; then
+		export v_exportmetadata_node=VDP1
+	elif [[ $v_exportmetadata_path_vdp == *2* ]]; then
+		export v_exportmetadata_node=VDP2
+	elif [[ $v_exportmetadata_path_vdp == *3* ]]; then
+		export v_exportmetadata_node=VDP3
+	else
+		export v_exportmetadata_node=VDP3
+	fi
+	echo $v_exportmetadata_node
+
+	#VDP export
+	sh /opt/denodo/denodo_8/bin/export.sh --server "//localhost:9999" --login admin --password encrypted:6AczlKN+tKYeeMPwCVwuTkZ8WRi5QAK5S3sI5kZq5e0vDX0KYCLsLob7RoXDtPCE/utVU6DNtg+KYbZ2Sojr1b+t0aUEZYNPXchq8HMeSNfXbhaRZZTUZcm9/lRxCrjX --zip --file $v_exportmetadata_path_vdp/"${v_exportmetadata_datetime}_export_vdp.zip" --property includeStatistics=yes --property includeUserPrivileges=yes
+	export v_exportmetadata_cmdresultcode_vdp=$?
+	echo $v_exportmetadata_cmdresultcode_vdp
+	if [ $v_exportmetadata_cmdresultcode_vdp -eq 0 ]; then
+		echo "All good"
+	else
+		echo "VDP export failed" |  mailx -s "Export error - HA ${v_exportmetadata_env} ${v_exportmetadata_azure_onprem} - ${v_exportmetadata_node}" $v_exportmetadata_email
+	fi
+
+	#Delete old backups
+	find $v_exportmetadata_path_vdp -mtime +14 -delete
+fi
+
+#services node metadata export
+if [[ -z $v_exportmetadata_path_services ]]; then
+	echo "Services path no need to hide"
+else
+	#Denodo DEV, TEST or PROD environment
+	if [[ $v_exportmetadata_path_services == *dev* ]]; then
+		export v_exportmetadata_env=DEV
+	elif [[ $v_exportmetadata_path_services == *test* ]]; then
+		export v_exportmetadata_env=TEST
+	else
+		export v_exportmetadata_env=PROD
+	fi
+	echo $v_exportmetadata_env
+
+	#Denodo onprem or azure environment
+	if [[ $v_exportmetadata_path_services == *onprem* ]]; then
+		export v_exportmetadata_azure_onprem=OnPrem
+	else
+		export v_exportmetadata_azure_onprem=Azure
+	fi
+	echo $v_exportmetadata_azure_onprem
+
+	#Services node
+	export v_exportmetadata_node=Services
+	echo $v_exportmetadata_node
+
+	#Scheduler export
+	sh /opt/denodo/denodo_8/tools/scheduler/export.sh -h localhost -p 8000 -l admin -P encrypted:6AczlKN+tKYeeMPwCVwuTkZ8WRi5QAK5S3sI5kZq5e0vDX0KYCLsLob7RoXDtPCE/utVU6DNtg+KYbZ2Sojr1b+t0aUEZYNPXchq8HMeSNfXbhaRZZTUZcm9/lRxCrjX -config -permissions -f $v_exportmetadata_path_services/"${v_exportmetadata_datetime}_export_scheduler.zip"
+	export v_exportmetadata_cmdresultcode_scheduler=$?
+	if [ $v_exportmetadata_cmdresultcode_scheduler -eq 0 ]; then
+		echo "Way to go"
+	else
+		echo "Scheduler export failed" |  mailx -s "Export error - HA ${v_exportmetadata_env} ${v_exportmetadata_azure_onprem} - ${v_exportmetadata_node}" $v_exportmetadata_email
+	fi
+
+	#Data Catalog export
+	sh /opt/denodo/denodo_8/tools/data-catalog/export.sh -h localhost -p 9443 -l admin -P encrypted:6AczlKN+tKYeeMPwCVwuTkZ8WRi5QAK5S3sI5kZq5e0vDX0KYCLsLob7RoXDtPCE/utVU6DNtg+KYbZ2Sojr1b+t0aUEZYNPXchq8HMeSNfXbhaRZZTUZcm9/lRxCrjX -s denodous-dev.gsk.com -f $v_exportmetadata_path_services/"${v_exportmetadata_datetime}_export_datacatalog.zip" -contentSearch -personalization -permissions -recommendations -https
+	export v_exportmetadata_cmdresultcode_datacatalog=$?
+	if [ $v_exportmetadata_cmdresultcode_datacatalog -eq 0 ]; then
+		echo "Bingo"
+	else
+		echo "Data Catalog export failed" | mailx -s "Export error - HA ${v_exportmetadata_env} ${v_exportmetadata_azure_onprem} - ${v_exportmetadata_node}" $v_exportmetadata_email
+	fi
+
+	#Delete old backups
+	find $v_exportmetadata_path_services -mtime +14 -delete
+fi
