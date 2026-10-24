@@ -294,6 +294,8 @@
     const offsetMin = typeof r === 'number' ? Math.round(tz * 60) : r.offsetMin;
     const jd = jdFromMs(ms);
     const asc = ascendantSidereal(jd, lat, lon);
+    const epsDeg = 23.439291 - 0.0130042 * tCent(jd);
+    const mcLon = norm(norm(Math.atan2(sin(asc.ramc), cos(asc.ramc) * cos(epsDeg)) * R2D) - ayanamsa(jd));
     const lagna = describe(asc.lon); lagna.navSign = navamsaSign(asc.lon);
     const planets = BODIES.map(key => {
       const l = siderealLon(key, jd);
@@ -303,7 +305,7 @@
     const moon = planets.find(p => p.key === 'Moon'), sun = planets.find(p => p.key === 'Sun');
     const localWeekday = new Date(new Date(Date.UTC(2000, month - 1, day)).setUTCFullYear(year)).getUTCDay();
     return {
-      input: inp, jd, utcMs: ms, offsetMin, ayanamsa: ayanamsa(jd),
+      input: inp, jd, utcMs: ms, offsetMin, ayanamsa: ayanamsa(jd), ramc: asc.ramc, mcLon, eps: epsDeg,
       lagna: Object.assign({ signLord: SIGN_LORDS[lagna.sign] }, lagna),
       planets,
       houses: Array.from({ length: 12 }, (_, i) => ({ house: i + 1, sign: (lagna.sign + i) % 12, signName: SIGNS[(lagna.sign + i) % 12], lord: SIGN_LORDS[(lagna.sign + i) % 12] })),
@@ -329,5 +331,5 @@
     return { ms, planets, sadeSati };
   }
 
-  return { vargaSign, VARGA_NAMES, VARGA_USE, CLASSICAL_VARGAS, computeChart, computeGochar, siderealLon, tropical: { sun: sunTropical, moon: moonTropical }, ayanamsa, jdFromMs, localToUtcMs, tzOffsetAt, SIGNS, SIGNS_SA, SIGN_LORDS, NAKSHATRAS, DASHA_YEARS, BODIES };
+  return { AYAN_J2000, meanLon: (n, jd) => { const k = KEP[n]; return norm(k[6] + k[7] * tCent(jd)); }, vargaSign, VARGA_NAMES, VARGA_USE, CLASSICAL_VARGAS, computeChart, computeGochar, siderealLon, tropical: { sun: sunTropical, moon: moonTropical }, ayanamsa, jdFromMs, localToUtcMs, tzOffsetAt, SIGNS, SIGNS_SA, SIGN_LORDS, NAKSHATRAS, DASHA_YEARS, BODIES };
 });
