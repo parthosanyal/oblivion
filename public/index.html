@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jyotish Kundli</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand"><span class="om">ॐ</span><div><h1>Jyotish Kundli</h1><p>Vedic birth chart · Lahiri ayanamsa · Vimshottari Dasha</p></div></div>
+</header>
+<main>
+  <section class="card form-card">
+    <h2>Birth details</h2>
+    <form id="form" autocomplete="off">
+      <label>Name<input id="name" placeholder="Optional"></label>
+      <div class="row2">
+        <label>Date of birth<input id="date" type="date" required></label>
+        <label>Time of birth<input id="time" type="time" required step="60"></label>
+      </div>
+      <label>Place of birth
+        <input id="place" list="cities" placeholder="Start typing a city…">
+        <datalist id="cities"></datalist>
+      </label>
+      <div class="row3">
+        <label>Latitude (+N)<input id="lat" type="number" step="0.0001" min="-90" max="90" required></label>
+        <label>Longitude (+E)<input id="lon" type="number" step="0.0001" min="-180" max="180" required></label>
+        <label>Time zone<input id="tz" list="tzs" value="Asia/Kolkata" required><datalist id="tzs"></datalist></label>
+      </div>
+      <p class="hint">Pick a listed city to auto-fill, or enter coordinates and an IANA time zone (e.g. Asia/Kolkata, America/New_York). Historic daylight-saving and zone changes are handled.</p>
+      <button class="primary" type="submit">Generate Kundli</button>
+      <p id="error" class="error" hidden></p>
+    </form>
+  </section>
+
+  <section id="result" hidden>
+    <div class="card summary" id="summary"></div>
+    <nav class="tabs" id="tabs">
+      <button data-tab="chart" class="on">Charts</button>
+      <button data-tab="planets">Planets</button>
+      <button data-tab="vargas">All Charts D1–D60</button>
+      <button data-tab="dasha">Dasha</button>
+      <button data-tab="predict">Life Predictions</button>
+      <button data-tab="panchang">Panchang &amp; Yogas</button>
+      <button data-tab="gochar">Transits</button>
+    </nav>
+
+
+      <div class="toolbar">
+        <span>Style:</span>
+        <label class="seg"><input type="radio" name="style" value="north" checked><span>North Indian</span></label>
+        <label class="seg"><input type="radio" name="style" value="south"><span>South Indian</span></label>
+        <button id="print" type="button" class="ghost">Print / Save PDF</button>
+      </div>
+
+    <div class="tab" id="tab-chart">
+      <div class="charts">
+        <figure class="card"><figcaption><select id="vSel1" class="vsel"></select></figcaption><div id="d1"></div><p class="hint" id="vNote1"></p></figure>
+        <figure class="card"><figcaption><select id="vSel2" class="vsel"></select></figcaption><div id="d9"></div><p class="hint" id="vNote2"></p></figure>
+      </div>
+      <p class="hint">Whole-sign houses. In the North Indian style houses are fixed (top = 1st house) and the small number is the sign; in the South Indian style signs are fixed and “Asc” marks the Lagna.</p>
+    </div>
+    <div class="tab" id="tab-planets" hidden><div class="card scroll" id="planetsTable"></div></div>
+    <div class="tab" id="tab-vargas" hidden><p class="hint">Every divisional chart from D1 to D60, each drawn independently. Click a chart to enlarge it.</p><div class="gallery" id="vargas"></div></div>
+    <div class="tab" id="tab-predict" hidden>
+      <div class="card" id="pNow"></div>
+      <div class="card" id="pChart"></div>
+      <div class="toolbar">
+        <label class="seg"><input type="radio" name="pview" value="v" checked><span>Vimshottari periods</span></label>
+        <label class="seg"><input type="radio" name="pview" value="y"><span>Yogini periods</span></label>
+        <label class="seg"><input type="radio" name="pview" value="yr"><span>Year by year</span></label>
+      </div>
+      <div class="card" id="pList"></div>
+      <div class="card" id="pWhy"></div>
+    </div>
+    <div class="tab" id="tab-dasha" hidden><div class="card" id="dasha"></div></div>
+    <div class="tab" id="tab-panchang" hidden><div class="card" id="panchang"></div><div class="card" id="yogas"></div></div>
+    <div class="tab" id="tab-gochar" hidden><div class="card" id="gochar"></div></div>
+  </section>
+</main>
+<dialog id="zoom"><button id="zoomClose" class="ghost" type="button">Close ✕</button><h3 id="zoomTitle"></h3><div id="zoomBody"></div><p class="hint" id="zoomNote"></p></dialog>
+<footer>Calculated in your browser; nothing is sent anywhere. Planetary positions are accurate to a fraction of a degree — verify against a professional ephemeris before relying on them. For reflection and entertainment, not professional advice.</footer>
+<script src="engine.js"></script>
+<script src="predict.js"></script>
+<script src="cities.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
