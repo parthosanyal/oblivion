@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Parashara Jyotish</title>
+<title>Jyotish Kundli</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -43,6 +43,8 @@
       <button data-tab="dasha">Dasha</button>
       <button data-tab="predict">Life Predictions</button>
       <button data-tab="panchang">Panchang &amp; Yogas</button>
+      <button data-tab="shadbala">Shadbala</button>
+      <button data-tab="av">Ashtakavarga</button>
       <button data-tab="gochar">Transits</button>
     </nav>
 
@@ -76,13 +78,34 @@
     </div>
     <div class="tab" id="tab-dasha" hidden><div class="card" id="dasha"></div></div>
     <div class="tab" id="tab-panchang" hidden><div class="card" id="panchang"></div><div class="card" id="yogas"></div></div>
-    <div class="tab" id="tab-gochar" hidden><div class="card" id="gochar"></div></div>
+    <div class="tab" id="tab-shadbala" hidden>
+      <div class="card" id="sbBars"></div>
+      <div class="card" id="sbPct"></div>
+      <div class="card scroll" id="sbTable"></div>
+    </div>
+    <div class="tab" id="tab-av" hidden>
+      <div class="toolbar" id="avSel"></div>
+      <div class="charts">
+        <figure class="card"><figcaption id="avTitle"></figcaption><div id="avChart"></div></figure>
+        <div class="card" id="avBars"></div>
+      </div>
+      <div class="card scroll" id="avTable"></div>
+    </div>
+    <div class="tab" id="tab-gochar" hidden>
+      <div class="card"><label style="max-width:240px">Transit date<input id="gDate" type="date"></label><p id="gSade"></p></div>
+      <div class="charts">
+        <figure class="card"><figcaption>Transit chart over your natal Lagna</figcaption><div id="gChart"></div></figure>
+        <div class="card" id="gBars"></div>
+      </div>
+      <div class="card scroll" id="gochar"></div>
+    </div>
   </section>
 </main>
 <dialog id="zoom"><button id="zoomClose" class="ghost" type="button">Close ✕</button><h3 id="zoomTitle"></h3><div id="zoomBody"></div><p class="hint" id="zoomNote"></p></dialog>
 <footer>Calculated in your browser; nothing is sent anywhere. Planetary positions are accurate to a fraction of a degree — verify against a professional ephemeris before relying on them. For reflection and entertainment, not professional advice.</footer>
 <script src="engine.js"></script>
 <script src="predict.js"></script>
+<script src="bala.js"></script>
 <script src="cities.js"></script>
 <script src="app.js"></script>
 </body>

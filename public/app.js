@@ -117,6 +117,7 @@
   function drawCharts() {
     if (!chart) return;
     drawGallery();
+    if (typeof drawAV === 'function' && AV) { drawAV(); renderGochar($('gDate').value ? Date.UTC(...$('gDate').value.split('-').map((x, i) => i === 1 ? x - 1 : +x), 6, 30) : Date.now()); }
     const style = document.querySelector('input[name=style]:checked').value, f = style === 'north' ? northSvg : southSvg;
     [['vSel1','d1','vNote1'],['vSel2','d9','vNote2']].forEach(([sel, box, note]) => {
       const n = +$(sel).value;
@@ -201,6 +202,72 @@
   }
   document.querySelectorAll('input[name=pview]').forEach(r => r.addEventListener('change', drawPredictList));
 
+  // ----- Shadbala, Ashtakavarga, transit charts -----
+  const BL = window.Bala;
+  const COMP = [['sthana','Sthana','--c1'],['dig','Dig','--c2'],['kala','Kala','--c3'],['cheshta','Cheshta','--c4'],['naisargika','Naisargika','--c5'],['drik','Drik','--c6']];
+  const r2 = x => (Math.round(x * 100) / 100).toFixed(2);
+  let SB = null, AV = null, avPick = 'SAV';
+  const toneOf = (v, good, ok) => v >= good ? 'fgood' : v >= ok ? 'fmid' : 'fbad';
+
+  function renderBala() {
+    SB = BL.shadbala(chart); AV = BL.ashtakavarga(chart);
+    const rows = SB.order.map(k => SB.planets[k]);
+    const scale = Math.max(...rows.map(r => Math.max(r.rupas, r.required))) * 1.1;
+    const key = `<div class="key">${COMP.map(c => `<span><i style="background:var(${c[2]})"></i>${c[1]}</span>`).join('')}<span><i style="border-left:2px dashed var(--ink);width:0;border-radius:0"></i>Minimum required</span></div>`;
+    $('sbBars').innerHTML = `<h2>Shadbala: six-fold strength (rupas)</h2><p class="hint">Each bar adds the six strengths of a planet. The dashed line is the minimum the classics ask for. Reaching it means 100%.</p>${key}` + rows.map(r => {
+      let x = 0, segs = '';
+      COMP.forEach(c => { const v = c[0] === 'drik' ? Math.max(0, r.drik) : r[c[0]]; const w = v / 60 / scale * 100; segs += `<i style="left:${x}%;width:${w}%;background:var(${c[2]})" title="${c[1]}: ${r2(r[c[0]] / 60)} rupas"></i>`; x += w; });
+      if (r.drik < 0) { const w = -r.drik / 60 / scale * 100; segs += `<i class="neg" style="left:${x - w}%;width:${w}%" title="Drik (negative): ${r2(r.drik / 60)} rupas"></i>`; }
+      return `<div class="hb"><span class="nm">${r.key}</span><div class="tr">${segs}<span class="mk" style="left:${r.required / scale * 100}%"></span></div><span class="val">${r2(r.rupas)}</span><span class="sub">needs ${r.required} · ${r.percent}% · ${r.label}</span></div>`;
+    }).join('');
+
+    $('sbPct').innerHTML = `<h2>Strength as a percentage of the requirement</h2><p class="hint">100% is the classical minimum. Above 150% is very strong, below 75% is weak.</p>` + rows.map(r => {
+      const sc = Math.max(200, ...rows.map(x => x.percent)) * 1.05;
+      return `<div class="hb"><span class="nm">${r.key}</span><div class="tr"><i class="fill ${toneOf(r.percent, 100, 75)}" style="left:0;width:${r.percent / sc * 100}%"></i><span class="mk" style="left:${100 / sc * 100}%"></span></div><span class="val">${r.percent}%</span><span class="sub">Rank ${r.rank} of 7 · Ishta ${r.ishta.toFixed(0)} / Kashta ${r.kashta.toFixed(0)} (benefic vs malefic result, out of 60)</span></div>`;
+    }).join('');
+
+    const m = SB.meta, f = x => x.toFixed(1);
+    $('sbTable').innerHTML = `<table><thead><tr><th>Planet</th><th>Uchcha</th><th>Saptavargaja</th><th>Ojhayugma</th><th>Kendradi</th><th>Drekkana</th><th>Sthana</th><th>Dig</th><th>Kala</th><th>Cheshta</th><th>Naisargika</th><th>Drik</th><th>Total (virupa)</th><th>Rupas</th><th>%</th></tr></thead><tbody>` +
+      rows.map(r => `<tr><td><b>${r.key}</b></td><td>${f(r.uchcha)}</td><td>${f(r.sapta)}</td><td>${f(r.ojha)}</td><td>${f(r.kendra)}</td><td>${f(r.drekkana)}</td><td><b>${f(r.sthana)}</b></td><td>${f(r.dig)}</td><td>${f(r.kala)}</td><td>${f(r.cheshta)}</td><td>${f(r.naisargika)}</td><td>${f(r.drik)}</td><td><b>${f(r.total)}</b></td><td>${r2(r.rupas)}</td><td><b>${r.percent}%</b></td></tr>`).join('') + `</tbody></table>
+      <p class="hint"><b>Kala bala detail:</b> ${rows.map(r => `${r.key}: Nathonnata ${f(r.nathonnata)}, Paksha ${f(r.paksha)}, Tribhaga ${f(r.tribhaga)}, Abda ${f(r.abda)}, Masa ${f(r.masa)}, Vara ${f(r.vara)}, Hora ${f(r.hora)}, Ayana ${f(r.ayana)}`).join(' · ')}</p>
+      <p class="hint">Birth was in the ${m.isDay ? 'day' : 'night'}. Vara lord ${m.varaLord}, Hora lord ${m.horaLord}, Masa lord ${m.masaLord}, Varsha lord ${m.abdaLord}, Tribhaga lord ${m.tribhagaLord}. 1 rupa = 60 virupa.</p>
+      <ul class="hint">${SB.notes.map(n => `<li>${n}</li>`).join('')}</ul>`;
+
+    // Ashtakavarga selector
+    $('avSel').innerHTML = `<span>Show:</span>` + ['SAV', ...BL.SEVEN].map(k => `<label class="seg avbtn"><input type="radio" name="avp" value="${k}" ${k === avPick ? 'checked' : ''}><span>${k === 'SAV' ? 'Sarvashtakavarga' : k}</span></label>`).join('');
+    document.querySelectorAll('input[name=avp]').forEach(r => r.addEventListener('change', () => { avPick = r.value; drawAV(); }));
+    const heat = v => `background:color-mix(in srgb,var(--ok) ${Math.round(v / 8 * 55)}%,transparent)`;
+    $('avTable').innerHTML = `<h2>Bhinnashtakavarga by sign</h2><table class="heat"><thead><tr><th class="h">Sign (house)</th>${BL.SEVEN.map(k => `<th>${k}</th>`).join('')}<th>SAV</th><th>SAV %</th></tr></thead><tbody>` +
+      AV.byHouse.map(h => `<tr><td class="h"><b>${E.SIGNS[h.sign]}</b> (${h.house})</td>${BL.SEVEN.map(k => `<td style="${heat(h.bav[k])}">${h.bav[k]}</td>`).join('')}<td><b>${h.sav}</b></td><td>${Math.round(h.sav / 56 * 100)}%</td></tr>`).join('') +
+      `<tr><td class="h"><b>Total</b></td>${BL.SEVEN.map(k => `<td><b>${AV.bav[k].total}</b></td>`).join('')}<td><b>${AV.savTotal}</b></td><td></td></tr></tbody></table><p class="hint">Percent = bindus ÷ 56, the most any sign can hold in the Sarvashtakavarga (8 per planet column). Signs at or above 28 are considered supportive. Tables follow Brihat Parashara Hora Shastra.</p>`;
+    drawAV();
+  }
+
+  function drawAV() {
+    if (!AV) return;
+    const style = document.querySelector('input[name=style]:checked').value, f = style === 'north' ? northSvg : southSvg;
+    const sav = avPick === 'SAV', arr = sav ? AV.sav : AV.bav[avPick].signs, max = sav ? 56 : 8, avg = sav ? 28 : null;
+    $('avTitle').textContent = sav ? `Sarvashtakavarga (total ${AV.savTotal})` : `${avPick} Bhinnashtakavarga (total ${AV.bav[avPick].total})`;
+    $('avChart').innerHTML = f(chart.lagna.sign, arr.map((v, s) => ({ sign: s, label: String(v) })));
+    $('avBars').innerHTML = `<h2>${sav ? 'Sarvashtakavarga' : avPick} by house</h2><p class="hint">Bars show bindus as a percentage of the maximum (${max}).${sav ? ' Dashed line = 28, the average.' : ' Dashed line = 4, the usual favourable level.'}</p>` +
+      AV.byHouse.map(h => { const v = arr[h.sign], pc = Math.round(v / max * 100), line = (sav ? 28 : 4) / max * 100, tone = sav ? toneOf(v, 28, 25) : toneOf(v, 5, 4);
+        return `<div class="hb"><span class="nm">${h.house}H ${E.SIGNS[h.sign].slice(0, 3)}</span><div class="tr"><i class="fill ${tone}" style="left:0;width:${pc}%"></i><span class="mk" style="left:${line}%"></span></div><span class="val">${v} · ${pc}%</span></div>`; }).join('');
+  }
+
+  function renderGochar(ms) {
+    const g = E.computeGochar(chart, ms), style = document.querySelector('input[name=style]:checked').value, f = style === 'north' ? northSvg : southSvg;
+    $('gSade').innerHTML = `<b>Saturn status on ${new Date(ms).toLocaleDateString()}:</b> ${g.sadeSati}`;
+    $('gChart').innerHTML = f(chart.lagna.sign, g.planets.map(p => ({ sign: p.sign, label: ABBR[p.key] + (p.retro && !['Rahu','Ketu'].includes(p.key) ? '℞' : '') })));
+    const rows = g.planets.filter(p => BL.SEVEN.includes(p.key));
+    $('gBars').innerHTML = `<h2>Transit strength (Ashtakavarga)</h2><p class="hint">For each planet, the bindus it holds in its own Bhinnashtakavarga for the sign it is transiting, as a percentage of 8. Five or more is favourable, four is neutral, three or fewer is testing.</p>` + rows.map(p => {
+      const v = AV.bav[p.key].signs[p.sign], pc = Math.round(v / 8 * 100), sv = AV.sav[p.sign];
+      return `<div class="hb"><span class="nm">${p.key}</span><div class="tr"><i class="fill ${toneOf(v, 5, 4)}" style="left:0;width:${pc}%"></i><span class="mk" style="left:50%"></span></div><span class="val">${v}/8 · ${pc}%</span><span class="sub">in ${p.signName} (your ${P.ord(p.fromLagna)} house, ${P.ord(p.fromMoon)} from Moon) · sign total ${sv}/56 = ${Math.round(sv / 56 * 100)}%${p.retro && !['Rahu','Ketu'].includes(p.key) ? ' · retrograde' : ''}</span></div>`;
+    }).join('');
+    $('gochar').innerHTML = `<h2>Transit positions</h2><table><thead><tr><th>Planet</th><th>Sign</th><th>Degree</th><th>Nakshatra</th><th>House from Lagna</th><th>House from Moon</th><th>Bindus</th></tr></thead><tbody>` +
+      g.planets.map(p => `<tr><td><b>${p.key}</b>${p.retro && !['Rahu','Ketu'].includes(p.key) ? ' ℞' : ''}</td><td>${p.signName}</td><td>${fmtDeg(p.deg)}</td><td>${p.nakshatra}</td><td>${p.fromLagna}</td><td>${p.fromMoon}</td><td>${BL.SEVEN.includes(p.key) ? AV.bav[p.key].signs[p.sign] + '/8' : '–'}</td></tr>`).join('') + `</tbody></table>`;
+  }
+  $('gDate').addEventListener('change', () => { if (chart && $('gDate').value) { const [y, m, d] = $('gDate').value.split('-').map(Number); renderGochar(Date.UTC(y, m - 1, d, 6, 30)); } });
+
   // ----- tables & text -----
   function render() {
     const c = chart, moon = c.planets.find(p => p.key === 'Moon'), sun = c.planets.find(p => p.key === 'Sun');
@@ -229,8 +296,8 @@
     $('panchang').innerHTML = `<h2>Panchang at birth</h2><div class="grid2">${kv('Vara (weekday)', pc.vara)}${kv('Tithi', `${pc.tithi} · ${pc.paksha}`)}${kv('Nakshatra', `${pc.nakshatra} (pada ${pc.pada})`)}${kv('Yoga', pc.yoga)}${kv('Karana', pc.karana)}</div><p class="hint">Weekday is the civil day; in strict Vedic reckoning the day begins at sunrise, so a birth before sunrise belongs to the previous Vara.</p>`;
     $('yogas').innerHTML = `<h2>Yogas &amp; doshas</h2>` + c.yogas.map(y => `<div class="yoga"><b>${y.name}</b> <span class="tag ${y.present ? (/dosha|sarp/i.test(y.name) ? 'bad' : 'good') : ''}">${y.present ? 'Present' : 'Absent'}</span><div class="hint">${esc(y.detail)}</div></div>`).join('') + `<p class="hint">Rule-based checks only; classical judgement also weighs strength, aspects and cancellations.</p>`;
 
-    const g = E.computeGochar(c, now);
-    $('gochar').innerHTML = `<h2>Current transits (Gochar) — ${new Date(now).toLocaleDateString()}</h2><p><b>Saturn status:</b> ${g.sadeSati}</p><div class="scroll"><table><thead><tr><th>Planet</th><th>Sign</th><th>Degree</th><th>Nakshatra</th><th>House from Lagna</th><th>House from Moon</th></tr></thead><tbody>` +
-      g.planets.map(p => `<tr><td><b>${p.key}</b>${p.retro && !['Rahu','Ketu'].includes(p.key) ? ' ℞' : ''}</td><td>${p.signName}</td><td>${fmtDeg(p.deg)}</td><td>${p.nakshatra}</td><td>${p.fromLagna}</td><td>${p.fromMoon}</td></tr>`).join('') + `</tbody></table></div>`;
+    renderBala();
+    const t = new Date(); $('gDate').value = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`;
+    renderGochar(now);
   }
 })();
