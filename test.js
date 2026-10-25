@@ -37,4 +37,13 @@ sb.order.forEach(k => { const r = sb.planets[k]; console.log(k.padEnd(8), 'sthan
 console.log('meta', JSON.stringify(sb.meta), 'MC', c2.mcLon.toFixed(1));
 const okSB = sb.order.every(k => isFinite(sb.planets[k].total) && sb.planets[k].rupas > 1 && sb.planets[k].rupas < 15);
 console.log(okSB ? 'PASS' : 'FAIL', 'shadbala sane'); if (!okAV || !okSB) fail++;
+// ---- readings
+const RD = require('./public/reading.js');
+const pr = RD.planets(c2), hr = RD.houses(c2), g2 = E.computeGochar(c2, Date.UTC(2026, 9, 25)), tr = RD.transits(c2, g2);
+const okRD = pr.length === 9 && hr.length === 12 && tr.length === 9 && pr.every(x => x.parts.length >= 5 && !/undefined|NaN/.test(JSON.stringify(x))) && hr.every(x => !/undefined|NaN/.test(x.text)) && tr.every(x => !/undefined|NaN/.test(x.text));
+console.log(okRD ? 'PASS' : 'FAIL', 'readings (9 planets, 12 houses, 9 transits, no undefined)');
+console.log('SAMPLE:', pr[4].headline, '=>', pr[4].parts.map(x => x.t).join(' ').slice(0, 420));
+console.log('SAMPLE:', hr[9].text.slice(0, 300));
+console.log('SAMPLE:', tr[4].headline, '=>', tr[4].text.slice(0, 300));
+if (!okRD) fail++;
 process.exit(fail ? 1 : 0);

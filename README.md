@@ -40,3 +40,9 @@ Ashtakoota Gun Milan (marriage matching), Ashtakavarga, Shadbala, divisional cha
 
 ## Security
 See SECURITY.md. The server is read-only, sends strict security headers and listens on localhost by default.
+
+## City data and licence
+`public/data/cities/` holds about 152,000 places (223 countries, with states and time zones) so any city works offline, in addition to the live worldwide search.
+Source: dr5hn/countries-states-cities-database (https://github.com/dr5hn/countries-states-cities-database), licensed under the Open Database Licence (ODbL 1.0).
+Keep this attribution if you share the data files; the ODbL requires derived databases to be shared under the same licence.
+Rare small villages may be missing: enter latitude, longitude and time zone by hand for those.
