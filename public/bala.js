@@ -162,5 +162,5 @@
     return { bav, sav, savTotal: sav.reduce((x, y) => x + y, 0), lagnaSign: lag,
       byHouse: Array.from({ length: 12 }, (_, i) => ({ house: i + 1, sign: (lag + i) % 12, sav: sav[(lag + i) % 12], bav: Object.fromEntries(SEVEN.map(k => [k, bav[k].signs[(lag + i) % 12]])) })) };
   }
-  return { shadbala, ashtakavarga, SEVEN, REQUIRED, NOTES };
+  return { shadbala, ashtakavarga, SEVEN, REQUIRED, NOTES, FRIENDS, ENEMIES };
 });

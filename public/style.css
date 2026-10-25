@@ -107,3 +107,17 @@ details.dasha-row .ptext,details.dasha-row .meta{padding:0 4px}
 .heat td{text-align:center;font-variant-numeric:tabular-nums}
 .heat td.h{text-align:left}
 .avbtn{margin:0}
+
+.placebox{position:relative;margin-bottom:10px}
+.placebox>label{display:block;font-size:13px;color:var(--mute)}
+#placeList{position:absolute;z-index:20;left:0;right:0;top:64px;margin:0;padding:4px;list-style:none;background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.18);max-height:280px;overflow:auto}
+#placeList li{padding:8px 10px;border-radius:7px;cursor:pointer;font-size:14px;display:flex;justify-content:space-between;gap:10px}
+#placeList li small{color:var(--mute);white-space:nowrap}
+#placeList li[aria-selected="true"],#placeList li:hover{background:color-mix(in srgb,var(--accent2) 16%,transparent)}
+.rcard{border-bottom:1px solid var(--line);padding:6px 0}
+.rcard summary{cursor:pointer;display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:6px 0;font-weight:600}
+.rcard dl{margin:4px 0 8px;display:grid;grid-template-columns:110px minmax(0,1fr);gap:4px 12px;font-size:14px}
+.rcard dt{color:var(--mute);font-size:12.5px;text-transform:uppercase;letter-spacing:.04em;padding-top:2px}
+.rcard dd{margin:0;max-width:75ch}
+.rtext{font-size:14.5px;margin:6px 0;max-width:80ch}
+@media(max-width:560px){.rcard dl{grid-template-columns:1fr}.rcard dt{padding:0}}
