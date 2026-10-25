@@ -7,14 +7,38 @@
   let chart = null;
 
   // ----- setup -----
-  const dl = $('cities');
-  window.CITIES.forEach(c => { const o = document.createElement('option'); o.value = c[0]; dl.appendChild(o); });
-  const tzs = (Intl.supportedValuesOf ? Intl.supportedValuesOf('timeZone') : ['Asia/Kolkata','UTC']);
-  tzs.forEach(z => { const o = document.createElement('option'); o.value = z; $('tzs').appendChild(o); });
+  const tzs = (Intl.supportedValuesOf ? Intl.supportedValuesOf('timeZone') : ['Asia/Kolkata', 'UTC']);
+  { const dl = document.createElement('datalist'); dl.id = 'tzs'; tzs.forEach(z => { const o = document.createElement('option'); o.value = z; dl.appendChild(o); }); document.body.appendChild(dl); $('tz').setAttribute('list', 'tzs'); }
+  // --- place search: instant built-in matches, then live worldwide results
+  let placeItems = [], placeSel = -1, placeTimer = null, placeAbort = null;
+  function showPlaces() {
+    const ul = $('placeList'); ul.innerHTML = '';
+    placeItems.forEach((c, i) => { const li = document.createElement('li'); li.role = 'option'; li.setAttribute('aria-selected', i === placeSel ? 'true' : 'false'); li.innerHTML = `<span>${esc(c.label)}</span><small>${c.lat.toFixed(2)}, ${c.lon.toFixed(2)}</small>`; li.addEventListener('mousedown', e => { e.preventDefault(); pickPlace(c); }); ul.appendChild(li); });
+    ul.hidden = !placeItems.length; $('place').setAttribute('aria-expanded', String(!ul.hidden));
+  }
+  function pickPlace(c) {
+    $('place').value = c.label; $('lat').value = c.lat; $('lon').value = c.lon; $('tz').value = c.tz;
+    placeItems = []; showPlaces(); $('placeMsg').textContent = `Using ${c.label}: latitude ${c.lat}, longitude ${c.lon}, time zone ${c.tz}.`;
+  }
   $('place').addEventListener('input', () => {
-    const c = window.CITIES.find(x => x[0] === $('place').value);
-    if (c) { $('lat').value = c[1]; $('lon').value = c[2]; $('tz').value = c[3]; }
+    const q = $('place').value; clearTimeout(placeTimer); if (placeAbort) placeAbort.abort();
+    const off = window.Geo.searchOffline(q, 8); placeItems = off; placeSel = -1; showPlaces();
+    if (window.Geo.norm(q).length < 2) { $('placeMsg').textContent = ''; return; }
+    $('placeMsg').textContent = 'Searching worldwide…';
+    placeTimer = setTimeout(async () => {
+      placeAbort = new AbortController();
+      try { const on = await window.Geo.searchOnline(q, placeAbort.signal); if ($('place').value !== q) return; placeItems = window.Geo.merge(on, off); placeSel = -1; showPlaces(); $('placeMsg').textContent = on.length ? `${on.length} worldwide match${on.length > 1 ? 'es' : ''}. Choose one, or fill the coordinates yourself.` : (off.length ? 'No worldwide match; showing the built-in list.' : 'No match found. Enter latitude, longitude and time zone yourself.'); }
+      catch (e) { if (e.name === 'AbortError') return; $('placeMsg').textContent = off.length ? 'Live worldwide search is unavailable here; showing the built-in list.' : 'Live search is unavailable. Enter latitude, longitude and time zone yourself.'; }
+    }, 350);
   });
+  $('place').addEventListener('keydown', e => {
+    if (!placeItems.length) return;
+    if (e.key === 'ArrowDown') { placeSel = (placeSel + 1) % placeItems.length; showPlaces(); e.preventDefault(); }
+    else if (e.key === 'ArrowUp') { placeSel = (placeSel - 1 + placeItems.length) % placeItems.length; showPlaces(); e.preventDefault(); }
+    else if (e.key === 'Enter' && placeSel >= 0) { pickPlace(placeItems[placeSel]); e.preventDefault(); }
+    else if (e.key === 'Escape') { placeItems = []; showPlaces(); }
+  });
+  $('place').addEventListener('blur', () => setTimeout(() => { placeItems = []; showPlaces(); }, 120));
   try { const s = JSON.parse(localStorage.getItem('jyotish-last') || 'null'); if (s) Object.keys(s).forEach(k => $(k) && ($(k).value = s[k])); } catch (e) {}
 
   $('form').addEventListener('submit', ev => {
@@ -72,7 +96,7 @@
       const here = bodies.filter(b => b.sign === sign).map(b => b.label);
       s += `<polygon points="${h.p}" fill="${i === 0 ? 'color-mix(in srgb,var(--gold) 14%,transparent)' : 'none'}" stroke="var(--gold)" stroke-width="1.5"/>`;
       s += `<text x="${h.s[0]}" y="${h.s[1]}" text-anchor="middle" font-size="13" fill="var(--mute)">${sign + 1}</text>`;
-      const per = [0,3,6,9].includes(i) ? 3 : 2, fs = here.length > 4 ? 12 : 14, lh = fs + 3;
+      const lng = bodies.some(b => b.label.length > 4), per = [0,3,6,9].includes(i) ? (lng ? 2 : 3) : 2, fs = lng ? (here.length > 4 ? 10 : 11.5) : (here.length > 4 ? 12 : 14), lh = fs + 3;
       const rows = []; for (let k = 0; k < here.length; k += per) rows.push(here.slice(k, k + per).join(' '));
       rows.forEach((r, k) => s += `<text x="${h.t[0]}" y="${h.t[1] + (k - (rows.length - 1) / 2) * lh + 5}" text-anchor="middle" font-size="${fs}" font-weight="600" fill="var(--accent2)">${esc(r)}</text>`);
     });
@@ -87,8 +111,9 @@
       if (sign === lagnaSign) s += `<line x1="${x}" y1="${y}" x2="${x + 18}" y2="${y}" stroke="var(--accent)" stroke-width="3"/><line x1="${x}" y1="${y}" x2="${x}" y2="${y + 18}" stroke="var(--accent)" stroke-width="3"/>`;
       s += `<text x="${x + 50}" y="${y + 14}" text-anchor="middle" font-size="11" fill="var(--mute)">${E.SIGNS[sign].slice(0, 3)}${sign === lagnaSign ? ' · Asc' : ''}</text>`;
       const here = bodies.filter(b => b.sign === sign).map(b => b.label);
+      const lng = bodies.some(b => b.label.length > 4), fz = lng ? 12 : 15;
       const rows = []; for (let k = 0; k < here.length; k += 2) rows.push(here.slice(k, k + 2).join(' '));
-      rows.forEach((r, k) => s += `<text x="${x + 50}" y="${y + 52 + (k - (rows.length - 1) / 2) * 18}" text-anchor="middle" font-size="15" font-weight="600" fill="var(--accent2)">${esc(r)}</text>`);
+      rows.forEach((r, k) => s += `<text x="${x + 50}" y="${y + 52 + (k - (rows.length - 1) / 2) * (fz + 3)}" text-anchor="middle" font-size="${fz}" font-weight="600" fill="var(--accent2)">${esc(r)}</text>`);
     }
     return s + '</svg>';
   }
@@ -117,7 +142,7 @@
   function drawCharts() {
     if (!chart) return;
     drawGallery();
-    if (typeof drawAV === 'function' && AV) { drawAV(); renderGochar($('gDate').value ? Date.UTC(...$('gDate').value.split('-').map((x, i) => i === 1 ? x - 1 : +x), 6, 30) : Date.now()); }
+    if (typeof drawAV === 'function' && AV) { drawAV(); renderGochar(curGDate()); }
     const style = document.querySelector('input[name=style]:checked').value, f = style === 'north' ? northSvg : southSvg;
     [['vSel1','d1','vNote1'],['vSel2','d9','vNote2']].forEach(([sel, box, note]) => {
       const n = +$(sel).value;
@@ -255,18 +280,31 @@
   }
 
   function renderGochar(ms) {
-    const g = E.computeGochar(chart, ms), style = document.querySelector('input[name=style]:checked').value, f = style === 'north' ? northSvg : southSvg;
+    const g = E.computeGochar(chart, ms), style = document.querySelector('input[name=style]:checked').value, f = style === 'north' ? northSvg : southSvg, showDeg = $('gDeg').checked;
     $('gSade').innerHTML = `<b>Saturn status on ${new Date(ms).toLocaleDateString()}:</b> ${g.sadeSati}`;
-    $('gChart').innerHTML = f(chart.lagna.sign, g.planets.map(p => ({ sign: p.sign, label: ABBR[p.key] + (p.retro && !['Rahu','Ketu'].includes(p.key) ? '℞' : '') })));
+    const rx = p => p.retro && !['Rahu','Ketu'].includes(p.key) ? '℞' : '';
+    $('gChart').innerHTML = f(chart.lagna.sign, g.planets.map(p => ({ sign: p.sign, label: ABBR[p.key] + rx(p) + (showDeg ? ' ' + Math.floor(p.deg) + '°' : '') })));
+    const nav = p => { const w = 30 / 9; return { sign: E.vargaSign(p.lon, 9), deg: ((p.deg % w) / w) * 30 }; };
+    $('gChart9').innerHTML = f(E.vargaSign(chart.lagna.lon, 9), g.planets.map(p => { const n = nav(p); return { sign: n.sign, label: ABBR[p.key] + rx(p) + (showDeg ? ' ' + Math.floor(n.deg) + '°' : '') }; }));
     const rows = g.planets.filter(p => BL.SEVEN.includes(p.key));
     $('gBars').innerHTML = `<h2>Transit strength (Ashtakavarga)</h2><p class="hint">For each planet, the bindus it holds in its own Bhinnashtakavarga for the sign it is transiting, as a percentage of 8. Five or more is favourable, four is neutral, three or fewer is testing.</p>` + rows.map(p => {
       const v = AV.bav[p.key].signs[p.sign], pc = Math.round(v / 8 * 100), sv = AV.sav[p.sign];
-      return `<div class="hb"><span class="nm">${p.key}</span><div class="tr"><i class="fill ${toneOf(v, 5, 4)}" style="left:0;width:${pc}%"></i><span class="mk" style="left:50%"></span></div><span class="val">${v}/8 · ${pc}%</span><span class="sub">in ${p.signName} (your ${P.ord(p.fromLagna)} house, ${P.ord(p.fromMoon)} from Moon) · sign total ${sv}/56 = ${Math.round(sv / 56 * 100)}%${p.retro && !['Rahu','Ketu'].includes(p.key) ? ' · retrograde' : ''}</span></div>`;
+      return `<div class="hb"><span class="nm">${p.key}</span><div class="tr"><i class="fill ${toneOf(v, 5, 4)}" style="left:0;width:${pc}%"></i><span class="mk" style="left:50%"></span></div><span class="val">${v}/8 · ${pc}%</span><span class="sub">${fmtDeg(p.deg)} ${p.signName} (your ${P.ord(p.fromLagna)} house, ${P.ord(p.fromMoon)} from Moon) · sign total ${sv}/56 = ${Math.round(sv / 56 * 100)}%${p.retro && !['Rahu','Ketu'].includes(p.key) ? ' · retrograde' : ''}</span></div>`;
     }).join('');
-    $('gochar').innerHTML = `<h2>Transit positions</h2><table><thead><tr><th>Planet</th><th>Sign</th><th>Degree</th><th>Nakshatra</th><th>House from Lagna</th><th>House from Moon</th><th>Bindus</th></tr></thead><tbody>` +
-      g.planets.map(p => `<tr><td><b>${p.key}</b>${p.retro && !['Rahu','Ketu'].includes(p.key) ? ' ℞' : ''}</td><td>${p.signName}</td><td>${fmtDeg(p.deg)}</td><td>${p.nakshatra}</td><td>${p.fromLagna}</td><td>${p.fromMoon}</td><td>${BL.SEVEN.includes(p.key) ? AV.bav[p.key].signs[p.sign] + '/8' : '–'}</td></tr>`).join('') + `</tbody></table>`;
+    $('gRead').innerHTML = `<h2>What each transit is touching</h2><p class="hint">Read by the house the planet occupies from your Lagna and from your Moon, plus its Ashtakavarga support.</p>` + RD.transits(chart, g).map(t => `<div class="rcard"><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><b>${esc(t.headline)}</b><span class="tag ${t.tone === 'good' ? 'good' : t.tone === 'bad' ? 'bad' : 'mid'}">${t.tone === 'good' ? 'Supportive' : t.tone === 'bad' ? 'Testing' : 'Neutral'}</span></div><p class="rtext">${esc(t.text)}</p></div>`).join('');
+    $('gochar').innerHTML = `<h2>Transit positions</h2><table><thead><tr><th>Planet</th><th>Sign</th><th>Degree</th><th>Nakshatra</th><th>Navamsa (D9)</th><th>House from Lagna</th><th>House from Moon</th><th>Bindus</th></tr></thead><tbody>` +
+      g.planets.map(p => `<tr><td><b>${p.key}</b>${rx(p) ? ' ℞' : ''}</td><td>${p.signName}</td><td>${fmtDeg(p.deg)}</td><td>${p.nakshatra}, pada ${p.pada}</td><td>${E.SIGNS[nav(p).sign]} ${fmtDeg(nav(p).deg)}</td><td>${p.fromLagna}</td><td>${p.fromMoon}</td><td>${BL.SEVEN.includes(p.key) ? AV.bav[p.key].signs[p.sign] + '/8' : '–'}</td></tr>`).join('') + `</tbody></table>`;
   }
-  $('gDate').addEventListener('change', () => { if (chart && $('gDate').value) { const [y, m, d] = $('gDate').value.split('-').map(Number); renderGochar(Date.UTC(y, m - 1, d, 6, 30)); } });
+  const RD = window.Reading;
+  $('gDeg').addEventListener('change', () => { if (chart) renderGochar(curGDate()); });
+  function curGDate() { return $('gDate').value ? Date.UTC(...$('gDate').value.split('-').map((x, i) => i === 1 ? x - 1 : +x), 6, 30) : Date.now(); }
+  function renderReadings() {
+    const pl = RD.planets(chart), hs = RD.houses(chart);
+    $('rdIntro').innerHTML = `<h2>Readings by placement</h2><p class="ptext">Each planet is read by the sign it occupies (own, friend or enemy sign), its house and house type, dignity, retrogression, conjunctions, aspects received, the houses it rules, its nakshatra and its Ashtakavarga support. Each house is read by its sign, lord, occupants, aspects and Sarvashtakavarga bindus. These are rule-based classical significations for reflection, not a consultation.</p>`;
+    $('rdPlanets').innerHTML = `<h2>Planets</h2>` + pl.map((p, i) => `<details class="rcard" ${i < 2 ? 'open' : ''}><summary><span>${esc(p.headline)}</span><span class="tag ${p.score >= 0.5 ? 'good' : p.score <= -0.5 ? 'bad' : 'mid'}">${p.strength} · ${p.score > 0 ? '+' : ''}${p.score}</span></summary><dl>${p.parts.map(x => `<dt>${x.h}</dt><dd>${esc(x.t)}</dd>`).join('')}</dl></details>`).join('');
+    $('rdHouses').innerHTML = `<h2>Houses</h2>` + hs.map(h => `<details class="rcard"><summary><span>${P.ord(h.house)} house · ${h.sign} · lord ${h.lord}</span><span class="tag ${h.tone}">${h.sav} bindus</span></summary><p class="rtext">${esc(h.text)}</p></details>`).join('');
+  }
+  $('gDate').addEventListener('change', () => { if (chart && $('gDate').value) renderGochar(curGDate()); });
 
   // ----- tables & text -----
   function render() {
@@ -297,6 +335,7 @@
     $('yogas').innerHTML = `<h2>Yogas &amp; doshas</h2>` + c.yogas.map(y => `<div class="yoga"><b>${y.name}</b> <span class="tag ${y.present ? (/dosha|sarp/i.test(y.name) ? 'bad' : 'good') : ''}">${y.present ? 'Present' : 'Absent'}</span><div class="hint">${esc(y.detail)}</div></div>`).join('') + `<p class="hint">Rule-based checks only; classical judgement also weighs strength, aspects and cancellations.</p>`;
 
     renderBala();
+    renderReadings();
     const t = new Date(); $('gDate').value = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`;
     renderGochar(now);
   }

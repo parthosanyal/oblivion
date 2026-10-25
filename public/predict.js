@@ -143,5 +143,5 @@
     return `${lord} brings focus on ${KARAKA[lord]}. In your chart it sits ${dig}in ${p.signName} in the ${ord(st.house)} house (${HOUSE_THEME[st.house]}) and ${rules}. Natal strength: ${st.label} (${st.score > 0 ? '+' : ''}${st.score}).`;
   }
 
-  return { compute, yoginiDasha, planetStrength, outlook, tone, HOUSE_THEME, KARAKA, YOGINI, ord };
+  return { JUP, SAT, KARAKA_: KARAKA, compute, yoginiDasha, planetStrength, outlook, tone, HOUSE_THEME, KARAKA, YOGINI, ord };
 });

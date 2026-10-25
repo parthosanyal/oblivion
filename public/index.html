@@ -23,16 +23,6 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Jyotish Kundli","url":"https://oblivion-ukmg.onrender.com/","applicationCategory":"LifestyleApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"INR"},"description":"Free Vedic astrology Kundli generator with divisional charts, Vimshottari and Yogini Dasha, Shadbala, Ashtakavarga and transits.","inLanguage":"en"}</script>
 <link rel="stylesheet" href="style.css">
 </head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-F1WQR46N6Q"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-F1WQR46N6Q');
-</script>
-<script src="https://app.secureprivacy.ai/script/6addfa536d13e606af005ff8.js"></script>
 <body>
 <header class="top">
   <div class="brand"><span class="om">ॐ</span><div><h1>Jyotish Kundli</h1><p>Vedic birth chart · Lahiri ayanamsa · Vimshottari Dasha</p></div></div>
@@ -46,16 +36,18 @@
         <label>Date of birth<input id="date" type="date" required></label>
         <label>Time of birth<input id="time" type="time" required step="60"></label>
       </div>
-      <label>Place of birth
-        <input id="place" list="cities" placeholder="Start typing a city…">
-        <datalist id="cities"></datalist>
-      </label>
+      <div class="placebox">
+        <label for="place">Place of birth (any city, town or village)</label>
+        <input id="place" type="text" role="combobox" aria-expanded="false" aria-controls="placeList" aria-autocomplete="list" placeholder="Start typing, e.g. Pune, Varanasi, Leicester…">
+        <ul id="placeList" role="listbox" hidden></ul>
+        <p id="placeMsg" class="hint" aria-live="polite"></p>
+      </div>
       <div class="row3">
         <label>Latitude (+N)<input id="lat" type="number" step="0.0001" min="-90" max="90" required></label>
         <label>Longitude (+E)<input id="lon" type="number" step="0.0001" min="-180" max="180" required></label>
         <label>Time zone<input id="tz" list="tzs" value="Asia/Kolkata" required><datalist id="tzs"></datalist></label>
       </div>
-      <p class="hint">Pick a listed city to auto-fill, or enter coordinates and an IANA time zone (e.g. Asia/Kolkata, America/New_York). Historic daylight-saving and zone changes are handled.</p>
+      <p class="hint">Choose a suggestion to fill latitude, longitude and time zone, or type them yourself (IANA zone such as Asia/Kolkata or America/New_York). Historic daylight-saving and zone changes are handled.</p>
       <button class="primary" type="submit">Generate Kundli</button>
       <p id="error" class="error" hidden></p>
     </form>
@@ -72,6 +64,7 @@
       <button data-tab="panchang">Panchang &amp; Yogas</button>
       <button data-tab="shadbala">Shadbala</button>
       <button data-tab="av">Ashtakavarga</button>
+      <button data-tab="read">Readings</button>
       <button data-tab="gochar">Transits</button>
     </nav>
 
@@ -118,12 +111,19 @@
       </div>
       <div class="card scroll" id="avTable"></div>
     </div>
+    <div class="tab" id="tab-read" hidden>
+      <div class="card" id="rdIntro"></div>
+      <div class="card" id="rdPlanets"></div>
+      <div class="card" id="rdHouses"></div>
+    </div>
     <div class="tab" id="tab-gochar" hidden>
-      <div class="card"><label style="max-width:240px">Transit date<input id="gDate" type="date"></label><p id="gSade"></p></div>
+      <div class="card"><div class="row2" style="align-items:end"><label>Transit date<input id="gDate" type="date"></label><label class="seg" style="margin-bottom:10px"><input type="checkbox" id="gDeg" checked><span>Show degrees on charts</span></label></div><p id="gSade"></p></div>
       <div class="charts">
-        <figure class="card"><figcaption>Transit chart over your natal Lagna</figcaption><div id="gChart"></div></figure>
-        <div class="card" id="gBars"></div>
+        <figure class="card"><figcaption>Transit chart (Rashi) over your natal Lagna</figcaption><div id="gChart"></div></figure>
+        <figure class="card"><figcaption>Transit Navamsa (D9) over your natal Navamsa Lagna</figcaption><div id="gChart9"></div><p class="hint">Degrees here are measured inside the Navamsa sign.</p></figure>
       </div>
+      <div class="card" id="gBars"></div>
+      <div class="card" id="gRead"></div>
       <div class="card scroll" id="gochar"></div>
     </div>
   </section>
@@ -137,15 +137,17 @@
       <li>Shadbala planetary strength with percentages, and Sarvashtakavarga and Bhinnashtakavarga charts</li>
       <li>Panchang, yogas and doshas (Manglik, Kaal Sarp, Gajakesari and more), current transits and Sade Sati</li>
     </ul>
-    <p class="hint">All calculations run in your browser. Your birth details are not sent to any server. Results are for learning and reflection, not professional advice.</p>
+    <p class="hint">All calculations run in your browser. Your birth date and time are not sent to any server; only a place name you type is looked up to find coordinates. Results are for learning and reflection, not professional advice.</p>
   </section>
 </main>
 <dialog id="zoom"><button id="zoomClose" class="ghost" type="button">Close ✕</button><h3 id="zoomTitle"></h3><div id="zoomBody"></div><p class="hint" id="zoomNote"></p></dialog>
-<footer>Calculated in your browser; nothing is sent anywhere. Planetary positions are accurate to a fraction of a degree — verify against a professional ephemeris before relying on them. For reflection and entertainment, not professional advice.</footer>
+<footer>Charts are calculated in your browser; your birth date and time never leave it. When you search for a place, only the place name you type is sent to Open-Meteo's free geocoding service. Planetary positions are accurate to a fraction of a degree — verify against a professional ephemeris before relying on them. For reflection and entertainment, not professional advice. Offline place data: <a href="https://github.com/dr5hn/countries-states-cities-database" rel="noopener" target="_blank">countries-states-cities-database</a> (ODbL 1.0).</footer>
 <script src="engine.js"></script>
 <script src="predict.js"></script>
 <script src="bala.js"></script>
+<script src="reading.js"></script>
 <script src="cities.js"></script>
+<script src="geo.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

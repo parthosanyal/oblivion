@@ -331,5 +331,5 @@
     return { ms, planets, sadeSati };
   }
 
-  return { AYAN_J2000, meanLon: (n, jd) => { const k = KEP[n]; return norm(k[6] + k[7] * tCent(jd)); }, vargaSign, VARGA_NAMES, VARGA_USE, CLASSICAL_VARGAS, computeChart, computeGochar, siderealLon, tropical: { sun: sunTropical, moon: moonTropical }, ayanamsa, jdFromMs, localToUtcMs, tzOffsetAt, SIGNS, SIGNS_SA, SIGN_LORDS, NAKSHATRAS, DASHA_YEARS, BODIES };
+  return { dignity, EXALT, DEBIL, OWN, AYAN_J2000, meanLon: (n, jd) => { const k = KEP[n]; return norm(k[6] + k[7] * tCent(jd)); }, vargaSign, VARGA_NAMES, VARGA_USE, CLASSICAL_VARGAS, computeChart, computeGochar, siderealLon, tropical: { sun: sunTropical, moon: moonTropical }, ayanamsa, jdFromMs, localToUtcMs, tzOffsetAt, SIGNS, SIGNS_SA, SIGN_LORDS, NAKSHATRAS, DASHA_YEARS, BODIES };
 });
