@@ -109,6 +109,20 @@ details.dasha-row .ptext,details.dasha-row .meta{padding:0 4px}
 .heat td{text-align:center;font-variant-numeric:tabular-nums}
 .heat td.h{text-align:left}
 .avbtn{margin:0}
+
+.placebox{position:relative;margin-bottom:10px}
+.placebox>label{display:block;font-size:13px;color:var(--mute)}
+#placeList{position:absolute;z-index:20;left:0;right:0;top:64px;margin:0;padding:4px;list-style:none;background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.18);max-height:280px;overflow:auto}
+#placeList li{padding:8px 10px;border-radius:7px;cursor:pointer;font-size:14px;display:flex;justify-content:space-between;gap:10px}
+#placeList li small{color:var(--mute);white-space:nowrap}
+#placeList li[aria-selected="true"],#placeList li:hover{background:color-mix(in srgb,var(--accent2) 16%,transparent)}
+.rcard{border-bottom:1px solid var(--line);padding:6px 0}
+.rcard summary{cursor:pointer;display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:6px 0;font-weight:600}
+.rcard dl{margin:4px 0 8px;display:grid;grid-template-columns:110px minmax(0,1fr);gap:4px 12px;font-size:14px}
+.rcard dt{color:var(--mute);font-size:12.5px;text-transform:uppercase;letter-spacing:.04em;padding-top:2px}
+.rcard dd{margin:0;max-width:75ch}
+.rtext{font-size:14.5px;margin:6px 0;max-width:80ch}
+@media(max-width:560px){.rcard dl{grid-template-columns:1fr}.rcard dt{padding:0}}
 </style>
 
 <header class="top">
@@ -123,16 +137,18 @@ details.dasha-row .ptext,details.dasha-row .meta{padding:0 4px}
         <label>Date of birth<input id="date" type="date" required></label>
         <label>Time of birth<input id="time" type="time" required step="60"></label>
       </div>
-      <label>Place of birth
-        <input id="place" list="cities" placeholder="Start typing a city…">
-        <datalist id="cities"></datalist>
-      </label>
+      <div class="placebox">
+        <label for="place">Place of birth (any city, town or village)</label>
+        <input id="place" type="text" role="combobox" aria-expanded="false" aria-controls="placeList" aria-autocomplete="list" placeholder="Start typing, e.g. Pune, Varanasi, Leicester…">
+        <ul id="placeList" role="listbox" hidden></ul>
+        <p id="placeMsg" class="hint" aria-live="polite"></p>
+      </div>
       <div class="row3">
         <label>Latitude (+N)<input id="lat" type="number" step="0.0001" min="-90" max="90" required></label>
         <label>Longitude (+E)<input id="lon" type="number" step="0.0001" min="-180" max="180" required></label>
         <label>Time zone<input id="tz" list="tzs" value="Asia/Kolkata" required><datalist id="tzs"></datalist></label>
       </div>
-      <p class="hint">Pick a listed city to auto-fill, or enter coordinates and an IANA time zone (e.g. Asia/Kolkata, America/New_York). Historic daylight-saving and zone changes are handled.</p>
+      <p class="hint">Choose a suggestion to fill latitude, longitude and time zone, or type them yourself (IANA zone such as Asia/Kolkata or America/New_York). Historic daylight-saving and zone changes are handled.</p>
       <button class="primary" type="submit">Generate Kundli</button>
       <p id="error" class="error" hidden></p>
     </form>
@@ -149,6 +165,7 @@ details.dasha-row .ptext,details.dasha-row .meta{padding:0 4px}
       <button data-tab="panchang">Panchang &amp; Yogas</button>
       <button data-tab="shadbala">Shadbala</button>
       <button data-tab="av">Ashtakavarga</button>
+      <button data-tab="read">Readings</button>
       <button data-tab="gochar">Transits</button>
     </nav>
 
@@ -194,12 +211,19 @@ details.dasha-row .ptext,details.dasha-row .meta{padding:0 4px}
       </div>
       <div class="card scroll" id="avTable"></div>
     </div>
+    <div class="tab" id="tab-read" hidden>
+      <div class="card" id="rdIntro"></div>
+      <div class="card" id="rdPlanets"></div>
+      <div class="card" id="rdHouses"></div>
+    </div>
     <div class="tab" id="tab-gochar" hidden>
-      <div class="card"><label style="max-width:240px">Transit date<input id="gDate" type="date"></label><p id="gSade"></p></div>
+      <div class="card"><div class="row2" style="align-items:end"><label>Transit date<input id="gDate" type="date"></label><label class="seg" style="margin-bottom:10px"><input type="checkbox" id="gDeg" checked><span>Show degrees on charts</span></label></div><p id="gSade"></p></div>
       <div class="charts">
-        <figure class="card"><figcaption>Transit chart over your natal Lagna</figcaption><div id="gChart"></div></figure>
-        <div class="card" id="gBars"></div>
+        <figure class="card"><figcaption>Transit chart (Rashi) over your natal Lagna</figcaption><div id="gChart"></div></figure>
+        <figure class="card"><figcaption>Transit Navamsa (D9) over your natal Navamsa Lagna</figcaption><div id="gChart9"></div><p class="hint">Degrees here are measured inside the Navamsa sign.</p></figure>
       </div>
+      <div class="card" id="gBars"></div>
+      <div class="card" id="gRead"></div>
       <div class="card scroll" id="gochar"></div>
     </div>
   </section>
@@ -213,11 +237,11 @@ details.dasha-row .ptext,details.dasha-row .meta{padding:0 4px}
       <li>Shadbala planetary strength with percentages, and Sarvashtakavarga and Bhinnashtakavarga charts</li>
       <li>Panchang, yogas and doshas (Manglik, Kaal Sarp, Gajakesari and more), current transits and Sade Sati</li>
     </ul>
-    <p class="hint">All calculations run in your browser. Your birth details are not sent to any server. Results are for learning and reflection, not professional advice.</p>
+    <p class="hint">All calculations run in your browser. Your birth date and time are not sent to any server; only a place name you type is looked up to find coordinates. Results are for learning and reflection, not professional advice.</p>
   </section>
 </main>
 <dialog id="zoom"><button id="zoomClose" class="ghost" type="button">Close ✕</button><h3 id="zoomTitle"></h3><div id="zoomBody"></div><p class="hint" id="zoomNote"></p></dialog>
-<footer>Calculated in your browser; nothing is sent anywhere. Planetary positions are accurate to a fraction of a degree — verify against a professional ephemeris before relying on them. For reflection and entertainment, not professional advice.</footer>
+<footer>Charts are calculated in your browser; your birth date and time never leave it. When you search for a place, only the place name you type is sent to Open-Meteo's free geocoding service. Planetary positions are accurate to a fraction of a degree — verify against a professional ephemeris before relying on them. For reflection and entertainment, not professional advice. Offline place data: <a href="https://github.com/dr5hn/countries-states-cities-database" rel="noopener" target="_blank">countries-states-cities-database</a> (ODbL 1.0).</footer>
 <script>/* Vedic astrology engine — dependency-free, runs in Node and the browser.
  * Sidereal zodiac (Lahiri ayanamsa), whole-sign houses, mean lunar node.
  * Sun/Moon: Meeus (Astronomical Algorithms). Planets: JPL approximate Keplerian elements (1800-2050).
@@ -551,7 +575,7 @@ details.dasha-row .ptext,details.dasha-row .meta{padding:0 4px}
     return { ms, planets, sadeSati };
   }
 
-  return { AYAN_J2000, meanLon: (n, jd) => { const k = KEP[n]; return norm(k[6] + k[7] * tCent(jd)); }, vargaSign, VARGA_NAMES, VARGA_USE, CLASSICAL_VARGAS, computeChart, computeGochar, siderealLon, tropical: { sun: sunTropical, moon: moonTropical }, ayanamsa, jdFromMs, localToUtcMs, tzOffsetAt, SIGNS, SIGNS_SA, SIGN_LORDS, NAKSHATRAS, DASHA_YEARS, BODIES };
+  return { dignity, EXALT, DEBIL, OWN, AYAN_J2000, meanLon: (n, jd) => { const k = KEP[n]; return norm(k[6] + k[7] * tCent(jd)); }, vargaSign, VARGA_NAMES, VARGA_USE, CLASSICAL_VARGAS, computeChart, computeGochar, siderealLon, tropical: { sun: sunTropical, moon: moonTropical }, ayanamsa, jdFromMs, localToUtcMs, tzOffsetAt, SIGNS, SIGNS_SA, SIGN_LORDS, NAKSHATRAS, DASHA_YEARS, BODIES };
 });
 </script>
 <script>/* Life-timeline engine: Vimshottari + Yogini Dasha, natal planet strength, Jupiter/Saturn transits.
@@ -699,7 +723,7 @@ details.dasha-row .ptext,details.dasha-row .meta{padding:0 4px}
     return `${lord} brings focus on ${KARAKA[lord]}. In your chart it sits ${dig}in ${p.signName} in the ${ord(st.house)} house (${HOUSE_THEME[st.house]}) and ${rules}. Natal strength: ${st.label} (${st.score > 0 ? '+' : ''}${st.score}).`;
   }
 
-  return { compute, yoginiDasha, planetStrength, outlook, tone, HOUSE_THEME, KARAKA, YOGINI, ord };
+  return { JUP, SAT, KARAKA_: KARAKA, compute, yoginiDasha, planetStrength, outlook, tone, HOUSE_THEME, KARAKA, YOGINI, ord };
 });
 </script>
 <script>/* Shadbala (six-fold planetary strength) and Ashtakavarga. Rule-based, Parashari method.
@@ -866,30 +890,452 @@ details.dasha-row .ptext,details.dasha-row .meta{padding:0 4px}
     return { bav, sav, savTotal: sav.reduce((x, y) => x + y, 0), lagnaSign: lag,
       byHouse: Array.from({ length: 12 }, (_, i) => ({ house: i + 1, sign: (lag + i) % 12, sav: sav[(lag + i) % 12], bav: Object.fromEntries(SEVEN.map(k => [k, bav[k].signs[(lag + i) % 12]])) })) };
   }
-  return { shadbala, ashtakavarga, SEVEN, REQUIRED, NOTES };
+  return { shadbala, ashtakavarga, SEVEN, REQUIRED, NOTES, FRIENDS, ENEMIES };
 });
 </script>
-<script>// name, lat, lon, IANA timezone. Type any coordinates manually for places not listed.
+<script>/* Placement-based readings: planets by sign/house/dignity/aspects, houses by lord and occupants, transits by house.
+ * Rule-based text built from classical significations. For reflection, not a professional consultation. */
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) module.exports = factory(require('./engine.js'), require('./predict.js'), require('./bala.js'));
+  else root.Reading = factory(root.VedicEngine, root.Predict, root.Bala);
+})(typeof self !== 'undefined' ? self : this, function (E, P, B) {
+  const ord = P.ord, HT = P.HOUSE_THEME;
+  const PH = {
+    Sun: ['strong sense of self, vitality and leadership; can be proud','family wealth and speech in focus; authority in money matters, sharp tone','courage, initiative and a strong will; self-effort pays off','pride in home and roots; comfort or the bond with the mother needs care','intelligence, creativity and leadership in learning; children need attention','victory over rivals, disciplined service and good stamina','a dominant partner or partnership ego; marriage needs shared authority','intense, researching nature; sudden changes in status and vitality swings','faith, mentors and fortune linked to father figures; principled, may question tradition','strong career drive, status and leadership; a classically favourable placement','gains through influential networks; ambitious and goal-achieving','a quiet, inward or foreign-linked life; expenses and a need for solitude'],
+    Moon: ['sensitive, adaptable and expressive; moods show on the face','family attachment, fluctuating finances, soothing speech and love of food','imaginative communicator, short travel and a close bond with siblings','deep attachment to home and mother; peace through a settled home','creative, emotionally intelligent and affectionate with children; romantic','emotional stress around work or health; suited to caring work; needs routine','caring and emotionally tied to partners; marriage shapes the mind','intuitive and emotionally intense; mental ups and downs and hidden worries','devotional and philosophical; loves travel and teachers; luck through the mother','public life, popularity and careers that deal with people or care','gains through friends, women and the public; wishes get fulfilled','vivid inner life, dreams, foreign settlement and spending on comfort'],
+    Mars: ['bold, energetic and competitive; short-tempered; injuries possible','blunt speech, family friction and earning through effort','excellent courage, stamina and initiative; sporty or technical skills','restless home life; pushes for property and vehicles; heat in the heart','sharp, competitive mind and passionate romance; caution with speculation','defeats enemies; high stamina and success in competition and service','passionate, argumentative partnerships; the classical Manglik placement','daring research and surgical energy; care needed with accidents; Manglik','bold pursuit of dharma and goals; may clash with teachers or father','ambitious, action-oriented career in technical, defence or sports fields','strong gains through drive and courage in competitive circles','hidden anger, foreign or secluded settings and spending on conflict'],
+    Mercury: ['quick, curious and youthful; talkative with a gift for learning','excellent speech and business sense; family wealth through intellect','skilful writer, communicator and trader; many short journeys','learning at home and a comfortable education; analytical about property','sharp intellect, good for study, advice and creative problem solving','analytical; good at service, accounts and health analysis','communicative partnerships and business partners; a youthful spouse','research mind with interest in finance or the occult; secretive thinking','broad learning, teaching and publishing; interest in philosophy and travel','success in business, communication, media or analysis','gains through trade, networks and clever ideas','imaginative mind; foreign work or background research; overthinking at night'],
+    Jupiter: ['wise, optimistic and respected; a protective influence on health and character','rich speech, family blessings and accumulated wealth','supportive siblings; learning through effort and writing','inner contentment, home comfort, education and a good bond with the mother','excellent for children, wisdom, teaching and good judgement','success over obstacles through ethics; watch weight, liver and debts','wise, supportive partners and good partnerships','longevity, research and inheritance; spiritual depth after setbacks','luck, dharma, teachers and fortune; a very strong placement','respected status, an ethical career, advisory or teaching roles','abundant gains, fulfilled desires and supportive networks','spiritual inclination, foreign settlement and charity; gains through retreat'],
+    Venus: ['charming, attractive and artistic; loves comfort and harmony','wealth, sweet speech, love of food, art and family harmony','creative talent and artistic hobbies; pleasant with siblings','a beautiful home, vehicles, comforts and a happy domestic life','romantic and creative; joy through children','service in beauty or the arts; relationship or health friction; watch indulgence','loving, attractive partners; harmonious marriage and business','intense relationships, sudden gains or inheritance; secrets in love','cultured, devotional and fortunate in love and travel','success in the arts, luxury, beauty or finance; a charming professional image','financial gains, fulfilled pleasures and many friends','bed pleasures, foreign comforts and spending on luxury; spiritual romance'],
+    Saturn: ['serious, disciplined and mature early; health and energy need pacing','frugal, measured speech; slow but steady wealth; family responsibilities','persevering and hardworking; courage through effort','restricted comfort early and responsibility at home; late-life stability','careful or delayed matters with children; serious about studies','overcomes enemies through patience; excellent for service and routine','delayed or mature partnerships; a responsible, loyal spouse','long life, endurance and research; chronic worries and hidden obstacles','a disciplined belief system and delayed fortune; strict teachers or father themes','a slow, steady rise; authority through persistent work','steady, long-term gains; older or serious friends','isolation, expenses, foreign work or spiritual discipline; protect sleep'],
+    Rahu: ['unconventional, ambitious personality; shifting identity and a magnetic presence','unusual speech or family background; sudden finances; watch diet','bold, tech-savvy and strong in media and communication','restless home life; foreign or unusual residence; mental unrest','unconventional intellect and speculation; an unusual approach to children','wins against rivals; success in competitive or foreign service','unconventional or foreign-linked partnerships; intense attraction','sudden transformations and interest in research or the occult; hidden fears','unorthodox beliefs, foreign travel and teachers','an ambitious public career in technology, politics or foreign links','big material gains and influential networks','foreign settlement, vivid dreams and spiritual seeking; hidden expenses'],
+    Ketu: ['detached, intuitive and introspective; a unique self-image','reserved speech and detachment from wealth; family patterns to unlearn','quietly courageous with a spiritual practice and strong will','detachment from home or mother; peace through spiritual practice','intuitive, spiritual intelligence; an unusual path with children or studies','victory over enemies and illness through detachment','karmic or detached partnerships; needs clarity in relationships','deep research, mystic insight and interest in the occult','a spiritual seeker detached from ritual; past-life wisdom','unconventional work and detachment from status; research or healing','quiet gains and spiritual friends','liberation, meditation and a secluded or foreign life']
+  };
+  const HTYPE = h => [1, 4, 7, 10].includes(h) ? 'kendra (angular, strong)' : [5, 9].includes(h) ? 'trikona (fortunate)' : [6, 8, 12].includes(h) ? 'dusthana (challenging)' : [3, 11].includes(h) ? 'upachaya (improves with time)' : 'neutral house';
+  const COMBUST = { Moon: 12, Mars: 17, Mercury: 14, Jupiter: 11, Venus: 10, Saturn: 15 };
+  const SPECIAL = { Mars: [4, 7, 8], Jupiter: [5, 7, 9], Saturn: [3, 7, 10] };
+  const join = a => a.length <= 1 ? (a[0] || '') : a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1];
+
+  function aspectsOn(chart, sign) { // planets whose sign-aspect falls on this sign
+    return chart.planets.filter(p => {
+      if (['Rahu', 'Ketu'].includes(p.key)) return false;
+      const hs = ((sign - p.sign + 12) % 12) + 1;
+      return hs !== 1 && (SPECIAL[p.key] || [7]).includes(hs);
+    }).map(p => p.key);
+  }
+  function signRelation(key, sign) {
+    const lord = E.SIGN_LORDS[sign];
+    if (lord === key) return 'its own sign';
+    if (['Rahu', 'Ketu'].includes(key)) return `the sign of ${lord}`;
+    return B.FRIENDS[key].includes(lord) ? `a friend's sign (${lord})` : B.ENEMIES[key].includes(lord) ? `an enemy's sign (${lord})` : `a neutral sign (${lord})`;
+  }
+
+  function planets(chart) {
+    const S = P.planetStrength(chart), AV = B.ashtakavarga(chart), sun = chart.planets.find(p => p.key === 'Sun');
+    return chart.planets.map(p => {
+      const st = S[p.key], parts = [];
+      const lord = chart.houses[p.house - 1].lord;
+      parts.push({ h: 'Placement', t: `${p.key} is in ${p.signName} (${signRelation(p.key, p.sign)}) in the ${ord(p.house)} house, a ${HTYPE(p.house)}. The house stands for ${HT[p.house]}.` });
+      parts.push({ h: 'Meaning', t: `In this house: ${PH[p.key][p.house - 1]}.` });
+      const cond = [];
+      if (p.dignity) cond.push(p.dignity === 'Exalted' ? 'exalted, which strengthens these results strongly' : p.dignity === 'Own sign' ? 'in its own sign, which gives stability and confidence' : 'debilitated, so results come with extra effort and may be delayed');
+      if (p.retro && !['Rahu', 'Ketu'].includes(p.key)) cond.push('retrograde, so its energy turns inward, results tend to be slower and revisited');
+      const cd = COMBUST[p.key]; if (cd && Math.abs(((p.lon - sun.lon + 540) % 360) - 180) < cd) cond.push(`close to the Sun (within ${cd}°), which can dim its independent expression (combust)`);
+      if (cond.length) parts.push({ h: 'Condition', t: `${p.key} is ${join(cond)}.` });
+      const mates = chart.planets.filter(q => q.key !== p.key && q.sign === p.sign).map(q => q.key);
+      const asp = aspectsOn(chart, p.sign).filter(k => k !== p.key);
+      if (mates.length || asp.length) parts.push({ h: 'Influences', t: `${mates.length ? 'Shares the sign with ' + join(mates) + '. ' : ''}${asp.length ? 'Receives the aspect of ' + join(asp) + '.' : ''}` });
+      if (st.owned.length) parts.push({ h: 'Rulership', t: `Rules the ${join(st.owned.map(ord))} house (${join(st.owned.map(o => HT[o]))}), so those matters are tied to the ${ord(p.house)} house themes.` });
+      else parts.push({ h: 'Rulership', t: `Has no sign of its own, so it acts through its sign lord ${E.SIGN_LORDS[p.sign]}, placed in the ${ord(chart.planets.find(q => q.key === E.SIGN_LORDS[p.sign]).house)} house.` });
+      parts.push({ h: 'Nakshatra', t: `${p.nakshatra}, pada ${p.pada}, ruled by ${p.nakLord}.` });
+      if (AV.bav[p.key]) { const b = AV.bav[p.key].signs[p.sign]; parts.push({ h: 'Ashtakavarga', t: `Holds ${b} of 8 bindus in ${p.signName} (${b >= 5 ? 'a supportive placement' : b === 4 ? 'average support' : 'low support, so effort is needed'}); the sign has ${AV.sav[p.sign]} Sarva bindus.` }); }
+      return { key: p.key, sign: p.signName, house: p.house, strength: st.label, score: st.score, parts, headline: `${p.key} in ${p.signName}, ${ord(p.house)} house` };
+    });
+  }
+
+  function houses(chart) {
+    const S = P.planetStrength(chart), AV = B.ashtakavarga(chart);
+    return chart.houses.map(h => {
+      const lord = chart.planets.find(p => p.key === h.lord), occ = chart.planets.filter(p => p.house === h.house).map(p => p.key);
+      const asp = aspectsOn(chart, h.sign);
+      const sav = AV.sav[h.sign];
+      const lh = lord.house;
+      const t = [`${ord(h.house)} house (${HT[h.house]}) falls in ${h.signName}, ruled by ${h.lord}.`,
+        `${h.lord} sits in the ${ord(lh)} house${lord.dignity ? ' (' + lord.dignity.toLowerCase() + ')' : ''}${lh === h.house ? '' : ', linking ' + HT[h.house].split(',')[0] + ' with ' + HT[lh].split(',')[0]}.${lh === h.house ? ' The lord is in its own house, which protects this area.' : [6, 8, 12].includes(lh) ? ' A lord in a difficult house asks for patience in this area.' : [1, 4, 5, 7, 9, 10].includes(lh) ? ' A lord in a kendra or trikona supports this area.' : ''}`,
+        occ.length ? `Occupied by ${join(occ)}.` : 'No planet sits here, so the lord\'s placement decides the results.',
+        asp.length ? `Aspected by ${join(asp)}.` : '',
+        `Sarvashtakavarga: ${sav} bindus (${sav >= 30 ? 'strong' : sav >= 28 ? 'supportive' : sav >= 25 ? 'average' : 'needs effort'}).`];
+      return { house: h.house, sign: h.signName, lord: h.lord, sav, text: t.filter(Boolean).join(' '), tone: sav >= 28 ? 'good' : sav >= 25 ? 'mid' : 'bad' };
+    });
+  }
+
+  function transits(chart, g) {
+    const AV = B.ashtakavarga(chart);
+    return g.planets.map(p => {
+      const bind = AV.bav[p.key] ? AV.bav[p.key].signs[p.sign] : null;
+      let moonNote = '';
+      if (p.key === 'Jupiter') moonNote = P.JUP[p.fromMoon] >= 1 ? ' From your Moon this is a favourable Jupiter transit.' : P.JUP[p.fromMoon] < 0 ? ' From your Moon this is a testing Jupiter transit.' : ' From your Moon this is a neutral Jupiter transit.';
+      if (p.key === 'Saturn') moonNote = P.SAT[p.fromMoon] >= 1 ? ' From your Moon this is a favourable Saturn transit.' : P.SAT[p.fromMoon] <= -0.8 ? ' From your Moon this is a demanding Saturn transit.' : ' From your Moon this is a moderate Saturn transit.';
+      const nm = E.vargaSign(p.lon, 9);
+      return { key: p.key, headline: `${p.key} in ${p.signName} ${Math.floor(p.deg)}°, Navamsa ${E.SIGNS[nm]}`,
+        text: `Transiting your ${ord(p.fromLagna)} house (${HT[p.fromLagna]}) and the ${ord(p.fromMoon)} house from your Moon. Activates: ${PH[p.key][p.fromLagna - 1]}.${moonNote}${bind != null ? ` Ashtakavarga support in this sign: ${bind}/8 (${bind >= 5 ? 'favourable' : bind === 4 ? 'neutral' : 'testing'}).` : ''}${p.retro && !['Rahu', 'Ketu'].includes(p.key) ? ' Currently retrograde, so themes are revisited.' : ''}`,
+        tone: bind == null ? 'mid' : bind >= 5 ? 'good' : bind === 4 ? 'mid' : 'bad' };
+    });
+  }
+  return { planets, houses, transits, PH };
+});
+</script>
+<script>// Built-in offline places: [name, latitude, longitude, IANA time zone]. Coordinates are approximate (about 0.05 degrees).
+// The live worldwide search (Open-Meteo) covers every other place.
 window.CITIES = [
-['Delhi, India',28.6139,77.2090,'Asia/Kolkata'],['Mumbai, India',19.0760,72.8777,'Asia/Kolkata'],['Kolkata, India',22.5726,88.3639,'Asia/Kolkata'],
-['Chennai, India',13.0827,80.2707,'Asia/Kolkata'],['Bengaluru, India',12.9716,77.5946,'Asia/Kolkata'],['Hyderabad, India',17.3850,78.4867,'Asia/Kolkata'],
-['Ahmedabad, India',23.0225,72.5714,'Asia/Kolkata'],['Pune, India',18.5204,73.8567,'Asia/Kolkata'],['Jaipur, India',26.9124,75.7873,'Asia/Kolkata'],
-['Lucknow, India',26.8467,80.9462,'Asia/Kolkata'],['Kanpur, India',26.4499,80.3319,'Asia/Kolkata'],['Nagpur, India',21.1458,79.0882,'Asia/Kolkata'],
-['Patna, India',25.5941,85.1376,'Asia/Kolkata'],['Bhopal, India',23.2599,77.4126,'Asia/Kolkata'],['Indore, India',22.7196,75.8577,'Asia/Kolkata'],
-['Varanasi, India',25.3176,82.9739,'Asia/Kolkata'],['Chandigarh, India',30.7333,76.7794,'Asia/Kolkata'],['Amritsar, India',31.6340,74.8723,'Asia/Kolkata'],
-['Surat, India',21.1702,72.8311,'Asia/Kolkata'],['Vadodara, India',22.3072,73.1812,'Asia/Kolkata'],['Thiruvananthapuram, India',8.5241,76.9366,'Asia/Kolkata'],
-['Kochi, India',9.9312,76.2673,'Asia/Kolkata'],['Coimbatore, India',11.0168,76.9558,'Asia/Kolkata'],['Madurai, India',9.9252,78.1198,'Asia/Kolkata'],
-['Visakhapatnam, India',17.6868,83.2185,'Asia/Kolkata'],['Bhubaneswar, India',20.2961,85.8245,'Asia/Kolkata'],['Guwahati, India',26.1445,91.7362,'Asia/Kolkata'],
-['Ranchi, India',23.3441,85.3096,'Asia/Kolkata'],['Raipur, India',21.2514,81.6296,'Asia/Kolkata'],['Dehradun, India',30.3165,78.0322,'Asia/Kolkata'],
-['Srinagar, India',34.0837,74.7973,'Asia/Kolkata'],['Ujjain, India',23.1765,75.7885,'Asia/Kolkata'],['Mysuru, India',12.2958,76.6394,'Asia/Kolkata'],
-['Kathmandu, Nepal',27.7172,85.3240,'Asia/Kathmandu'],['Colombo, Sri Lanka',6.9271,79.8612,'Asia/Colombo'],['Dhaka, Bangladesh',23.8103,90.4125,'Asia/Dhaka'],
-['Karachi, Pakistan',24.8607,67.0011,'Asia/Karachi'],['Dubai, UAE',25.2048,55.2708,'Asia/Dubai'],['Singapore',1.3521,103.8198,'Asia/Singapore'],
-['Kuala Lumpur, Malaysia',3.1390,101.6869,'Asia/Kuala_Lumpur'],['Bangkok, Thailand',13.7563,100.5018,'Asia/Bangkok'],['Tokyo, Japan',35.6762,139.6503,'Asia/Tokyo'],
-['Sydney, Australia',-33.8688,151.2093,'Australia/Sydney'],['London, UK',51.5074,-0.1278,'Europe/London'],['Paris, France',48.8566,2.3522,'Europe/Paris'],
-['Berlin, Germany',52.5200,13.4050,'Europe/Berlin'],['New York, USA',40.7128,-74.0060,'America/New_York'],['Chicago, USA',41.8781,-87.6298,'America/Chicago'],
-['Los Angeles, USA',34.0522,-118.2437,'America/Los_Angeles'],['San Francisco, USA',37.7749,-122.4194,'America/Los_Angeles'],['Houston, USA',29.7604,-95.3698,'America/Chicago'],
-['Toronto, Canada',43.6532,-79.3832,'America/Toronto'],['Nairobi, Kenya',-1.2921,36.8219,'Africa/Nairobi'],['Johannesburg, South Africa',-26.2041,28.0473,'Africa/Johannesburg']
+["Delhi (New Delhi), Delhi, India", 28.6139, 77.209, "Asia/Kolkata"],
+["Mumbai, Maharashtra, India", 19.076, 72.8777, "Asia/Kolkata"],
+["Kolkata, West Bengal, India", 22.5726, 88.3639, "Asia/Kolkata"],
+["Chennai, Tamil Nadu, India", 13.0827, 80.2707, "Asia/Kolkata"],
+["Bengaluru (Bangalore), Karnataka, India", 12.9716, 77.5946, "Asia/Kolkata"],
+["Hyderabad, Telangana, India", 17.385, 78.4867, "Asia/Kolkata"],
+["Ahmedabad, Gujarat, India", 23.0225, 72.5714, "Asia/Kolkata"],
+["Pune, Maharashtra, India", 18.5204, 73.8567, "Asia/Kolkata"],
+["Jaipur, Rajasthan, India", 26.9124, 75.7873, "Asia/Kolkata"],
+["Lucknow, Uttar Pradesh, India", 26.8467, 80.9462, "Asia/Kolkata"],
+["Kanpur, Uttar Pradesh, India", 26.4499, 80.3319, "Asia/Kolkata"],
+["Nagpur, Maharashtra, India", 21.1458, 79.0882, "Asia/Kolkata"],
+["Patna, Bihar, India", 25.5941, 85.1376, "Asia/Kolkata"],
+["Bhopal, Madhya Pradesh, India", 23.2599, 77.4126, "Asia/Kolkata"],
+["Indore, Madhya Pradesh, India", 22.7196, 75.8577, "Asia/Kolkata"],
+["Varanasi (Kashi), Uttar Pradesh, India", 25.3176, 82.9739, "Asia/Kolkata"],
+["Chandigarh, Chandigarh, India", 30.7333, 76.7794, "Asia/Kolkata"],
+["Amritsar, Punjab, India", 31.634, 74.8723, "Asia/Kolkata"],
+["Surat, Gujarat, India", 21.1702, 72.8311, "Asia/Kolkata"],
+["Vadodara (Baroda), Gujarat, India", 22.3072, 73.1812, "Asia/Kolkata"],
+["Thiruvananthapuram (Trivandrum), Kerala, India", 8.5241, 76.9366, "Asia/Kolkata"],
+["Kochi (Cochin), Kerala, India", 9.9312, 76.2673, "Asia/Kolkata"],
+["Coimbatore, Tamil Nadu, India", 11.0168, 76.9558, "Asia/Kolkata"],
+["Madurai, Tamil Nadu, India", 9.9252, 78.1198, "Asia/Kolkata"],
+["Visakhapatnam (Vizag), Andhra Pradesh, India", 17.6868, 83.2185, "Asia/Kolkata"],
+["Bhubaneswar, Odisha, India", 20.2961, 85.8245, "Asia/Kolkata"],
+["Guwahati, Assam, India", 26.1445, 91.7362, "Asia/Kolkata"],
+["Ranchi, Jharkhand, India", 23.3441, 85.3096, "Asia/Kolkata"],
+["Raipur, Chhattisgarh, India", 21.2514, 81.6296, "Asia/Kolkata"],
+["Dehradun, Uttarakhand, India", 30.3165, 78.0322, "Asia/Kolkata"],
+["Srinagar, Jammu and Kashmir, India", 34.0837, 74.7973, "Asia/Kolkata"],
+["Ujjain, Madhya Pradesh, India", 23.1765, 75.7885, "Asia/Kolkata"],
+["Mysuru (Mysore), Karnataka, India", 12.2958, 76.6394, "Asia/Kolkata"],
+["Agra, Uttar Pradesh, India", 27.1767, 78.0081, "Asia/Kolkata"],
+["Prayagraj (Allahabad), Uttar Pradesh, India", 25.4358, 81.8463, "Asia/Kolkata"],
+["Meerut, Uttar Pradesh, India", 28.9845, 77.7064, "Asia/Kolkata"],
+["Ghaziabad, Uttar Pradesh, India", 28.6692, 77.4538, "Asia/Kolkata"],
+["Noida, Uttar Pradesh, India", 28.5355, 77.391, "Asia/Kolkata"],
+["Gurugram (Gurgaon), Haryana, India", 28.4595, 77.0266, "Asia/Kolkata"],
+["Faridabad, Haryana, India", 28.4089, 77.3178, "Asia/Kolkata"],
+["Ludhiana, Punjab, India", 30.901, 75.8573, "Asia/Kolkata"],
+["Jalandhar, Punjab, India", 31.326, 75.5762, "Asia/Kolkata"],
+["Patiala, Punjab, India", 30.3398, 76.3869, "Asia/Kolkata"],
+["Shimla, Himachal Pradesh, India", 31.1048, 77.1734, "Asia/Kolkata"],
+["Jammu, Jammu and Kashmir, India", 32.7266, 74.857, "Asia/Kolkata"],
+["Haridwar, Uttarakhand, India", 29.9457, 78.1642, "Asia/Kolkata"],
+["Rishikesh, Uttarakhand, India", 30.0869, 78.2676, "Asia/Kolkata"],
+["Mathura, Uttar Pradesh, India", 27.4924, 77.6737, "Asia/Kolkata"],
+["Vrindavan, Uttar Pradesh, India", 27.58, 77.7, "Asia/Kolkata"],
+["Aligarh, Uttar Pradesh, India", 27.8974, 78.088, "Asia/Kolkata"],
+["Bareilly, Uttar Pradesh, India", 28.367, 79.4304, "Asia/Kolkata"],
+["Moradabad, Uttar Pradesh, India", 28.8386, 78.7733, "Asia/Kolkata"],
+["Gorakhpur, Uttar Pradesh, India", 26.7606, 83.3732, "Asia/Kolkata"],
+["Jhansi, Uttar Pradesh, India", 25.4484, 78.5685, "Asia/Kolkata"],
+["Ayodhya, Uttar Pradesh, India", 26.7922, 82.1998, "Asia/Kolkata"],
+["Jodhpur, Rajasthan, India", 26.2389, 73.0243, "Asia/Kolkata"],
+["Udaipur, Rajasthan, India", 24.5854, 73.7125, "Asia/Kolkata"],
+["Kota, Rajasthan, India", 25.2138, 75.8648, "Asia/Kolkata"],
+["Bikaner, Rajasthan, India", 28.0229, 73.3119, "Asia/Kolkata"],
+["Ajmer, Rajasthan, India", 26.4499, 74.6399, "Asia/Kolkata"],
+["Jaisalmer, Rajasthan, India", 26.9157, 70.9083, "Asia/Kolkata"],
+["Pushkar, Rajasthan, India", 26.49, 74.5513, "Asia/Kolkata"],
+["Mount Abu, Rajasthan, India", 24.5926, 72.7156, "Asia/Kolkata"],
+["Gwalior, Madhya Pradesh, India", 26.2183, 78.1828, "Asia/Kolkata"],
+["Jabalpur, Madhya Pradesh, India", 23.1815, 79.9864, "Asia/Kolkata"],
+["Rajkot, Gujarat, India", 22.3039, 70.8022, "Asia/Kolkata"],
+["Bhavnagar, Gujarat, India", 21.7645, 72.1519, "Asia/Kolkata"],
+["Jamnagar, Gujarat, India", 22.4707, 70.0577, "Asia/Kolkata"],
+["Gandhinagar, Gujarat, India", 23.2156, 72.6369, "Asia/Kolkata"],
+["Dwarka, Gujarat, India", 22.2394, 68.9678, "Asia/Kolkata"],
+["Somnath, Gujarat, India", 20.888, 70.4013, "Asia/Kolkata"],
+["Nashik, Maharashtra, India", 19.9975, 73.7898, "Asia/Kolkata"],
+["Aurangabad (Chhatrapati Sambhajinagar), Maharashtra, India", 19.8762, 75.3433, "Asia/Kolkata"],
+["Solapur, Maharashtra, India", 17.6599, 75.9064, "Asia/Kolkata"],
+["Kolhapur, Maharashtra, India", 16.705, 74.2433, "Asia/Kolkata"],
+["Thane, Maharashtra, India", 19.2183, 72.9781, "Asia/Kolkata"],
+["Navi Mumbai, Maharashtra, India", 19.033, 73.0297, "Asia/Kolkata"],
+["Amravati, Maharashtra, India", 20.9374, 77.7796, "Asia/Kolkata"],
+["Nanded, Maharashtra, India", 19.1383, 77.321, "Asia/Kolkata"],
+["Latur, Maharashtra, India", 18.4088, 76.5604, "Asia/Kolkata"],
+["Sangli, Maharashtra, India", 16.8524, 74.5815, "Asia/Kolkata"],
+["Akola, Maharashtra, India", 20.7002, 77.0082, "Asia/Kolkata"],
+["Shirdi, Maharashtra, India", 19.7645, 74.4769, "Asia/Kolkata"],
+["Pandharpur, Maharashtra, India", 17.6792, 75.332, "Asia/Kolkata"],
+["Panaji, Goa, India", 15.4909, 73.8278, "Asia/Kolkata"],
+["Margao, Goa, India", 15.2993, 73.958, "Asia/Kolkata"],
+["Belagavi (Belgaum), Karnataka, India", 15.8497, 74.4977, "Asia/Kolkata"],
+["Hubballi (Hubli), Karnataka, India", 15.3647, 75.124, "Asia/Kolkata"],
+["Mangaluru (Mangalore), Karnataka, India", 12.9141, 74.856, "Asia/Kolkata"],
+["Davangere, Karnataka, India", 14.4644, 75.9218, "Asia/Kolkata"],
+["Ballari (Bellary), Karnataka, India", 15.1394, 76.9214, "Asia/Kolkata"],
+["Shivamogga (Shimoga), Karnataka, India", 13.9299, 75.5681, "Asia/Kolkata"],
+["Kalaburagi (Gulbarga), Karnataka, India", 17.3297, 76.8343, "Asia/Kolkata"],
+["Udupi, Karnataka, India", 13.3409, 74.7421, "Asia/Kolkata"],
+["Tirupati, Andhra Pradesh, India", 13.6288, 79.4192, "Asia/Kolkata"],
+["Vijayawada, Andhra Pradesh, India", 16.5062, 80.648, "Asia/Kolkata"],
+["Guntur, Andhra Pradesh, India", 16.3067, 80.4365, "Asia/Kolkata"],
+["Nellore, Andhra Pradesh, India", 14.4426, 79.9865, "Asia/Kolkata"],
+["Kurnool, Andhra Pradesh, India", 15.8281, 78.0373, "Asia/Kolkata"],
+["Anantapur, Andhra Pradesh, India", 14.6819, 77.6006, "Asia/Kolkata"],
+["Kadapa, Andhra Pradesh, India", 14.4673, 78.8242, "Asia/Kolkata"],
+["Rajahmundry, Andhra Pradesh, India", 17.0005, 81.804, "Asia/Kolkata"],
+["Kakinada, Andhra Pradesh, India", 16.9891, 82.2475, "Asia/Kolkata"],
+["Warangal, Telangana, India", 17.9689, 79.5941, "Asia/Kolkata"],
+["Karimnagar, Telangana, India", 18.4386, 79.1288, "Asia/Kolkata"],
+["Nizamabad, Telangana, India", 18.6725, 78.0941, "Asia/Kolkata"],
+["Khammam, Telangana, India", 17.2473, 80.1514, "Asia/Kolkata"],
+["Salem, Tamil Nadu, India", 11.6643, 78.146, "Asia/Kolkata"],
+["Tiruchirappalli (Trichy), Tamil Nadu, India", 10.7905, 78.7047, "Asia/Kolkata"],
+["Tirunelveli, Tamil Nadu, India", 8.7139, 77.7567, "Asia/Kolkata"],
+["Vellore, Tamil Nadu, India", 12.9165, 79.1325, "Asia/Kolkata"],
+["Erode, Tamil Nadu, India", 11.341, 77.7172, "Asia/Kolkata"],
+["Thanjavur, Tamil Nadu, India", 10.787, 79.1378, "Asia/Kolkata"],
+["Tiruppur, Tamil Nadu, India", 11.1085, 77.3411, "Asia/Kolkata"],
+["Kanchipuram, Tamil Nadu, India", 12.8342, 79.7036, "Asia/Kolkata"],
+["Rameswaram, Tamil Nadu, India", 9.2876, 79.3129, "Asia/Kolkata"],
+["Kanyakumari, Tamil Nadu, India", 8.0883, 77.5385, "Asia/Kolkata"],
+["Ooty (Udhagamandalam), Tamil Nadu, India", 11.4064, 76.6932, "Asia/Kolkata"],
+["Puducherry (Pondicherry), Puducherry, India", 11.9416, 79.8083, "Asia/Kolkata"],
+["Kozhikode (Calicut), Kerala, India", 11.2588, 75.7804, "Asia/Kolkata"],
+["Thrissur, Kerala, India", 10.5276, 76.2144, "Asia/Kolkata"],
+["Kollam, Kerala, India", 8.8932, 76.6141, "Asia/Kolkata"],
+["Kannur, Kerala, India", 11.8745, 75.3704, "Asia/Kolkata"],
+["Alappuzha (Alleppey), Kerala, India", 9.4981, 76.3388, "Asia/Kolkata"],
+["Palakkad, Kerala, India", 10.7867, 76.6548, "Asia/Kolkata"],
+["Kottayam, Kerala, India", 9.5916, 76.5222, "Asia/Kolkata"],
+["Cuttack, Odisha, India", 20.4625, 85.883, "Asia/Kolkata"],
+["Rourkela, Odisha, India", 22.2604, 84.8536, "Asia/Kolkata"],
+["Puri, Odisha, India", 19.8135, 85.8312, "Asia/Kolkata"],
+["Jamshedpur, Jharkhand, India", 22.8046, 86.2029, "Asia/Kolkata"],
+["Dhanbad, Jharkhand, India", 23.7957, 86.4304, "Asia/Kolkata"],
+["Bokaro, Jharkhand, India", 23.6693, 86.1511, "Asia/Kolkata"],
+["Gaya, Bihar, India", 24.7955, 85.0002, "Asia/Kolkata"],
+["Bodh Gaya, Bihar, India", 24.6961, 84.9869, "Asia/Kolkata"],
+["Muzaffarpur, Bihar, India", 26.1209, 85.3647, "Asia/Kolkata"],
+["Bhagalpur, Bihar, India", 25.2425, 86.9842, "Asia/Kolkata"],
+["Darbhanga, Bihar, India", 26.1542, 85.8918, "Asia/Kolkata"],
+["Siliguri, West Bengal, India", 26.7271, 88.3953, "Asia/Kolkata"],
+["Durgapur, West Bengal, India", 23.5204, 87.3119, "Asia/Kolkata"],
+["Asansol, West Bengal, India", 23.6739, 86.9524, "Asia/Kolkata"],
+["Howrah, West Bengal, India", 22.5958, 88.2636, "Asia/Kolkata"],
+["Imphal, Manipur, India", 24.817, 93.9368, "Asia/Kolkata"],
+["Shillong, Meghalaya, India", 25.5788, 91.8933, "Asia/Kolkata"],
+["Agartala, Tripura, India", 23.8315, 91.2868, "Asia/Kolkata"],
+["Aizawl, Mizoram, India", 23.7271, 92.7176, "Asia/Kolkata"],
+["Kohima, Nagaland, India", 25.6751, 94.1086, "Asia/Kolkata"],
+["Itanagar, Arunachal Pradesh, India", 27.0844, 93.6053, "Asia/Kolkata"],
+["Gangtok, Sikkim, India", 27.3389, 88.6065, "Asia/Kolkata"],
+["Dibrugarh, Assam, India", 27.4728, 94.912, "Asia/Kolkata"],
+["Jorhat, Assam, India", 26.7509, 94.2037, "Asia/Kolkata"],
+["Silchar, Assam, India", 24.8333, 92.7789, "Asia/Kolkata"],
+["Port Blair, Andaman and Nicobar, India", 11.6234, 92.7265, "Asia/Kolkata"],
+["Leh, Ladakh, India", 34.1526, 77.5771, "Asia/Kolkata"],
+["Katra (Vaishno Devi), Jammu and Kashmir, India", 32.9916, 74.9455, "Asia/Kolkata"],
+["Ratlam, Madhya Pradesh, India", 23.3315, 75.0367, "Asia/Kolkata"],
+["Sagar, Madhya Pradesh, India", 23.8388, 78.7378, "Asia/Kolkata"],
+["Rewa, Madhya Pradesh, India", 24.5373, 81.3042, "Asia/Kolkata"],
+["Satna, Madhya Pradesh, India", 24.6005, 80.8322, "Asia/Kolkata"],
+["Bilaspur, Chhattisgarh, India", 22.0797, 82.1409, "Asia/Kolkata"],
+["Bhilai, Chhattisgarh, India", 21.2094, 81.379, "Asia/Kolkata"],
+["Korba, Chhattisgarh, India", 22.3595, 82.7501, "Asia/Kolkata"],
+["Rohtak, Haryana, India", 28.8955, 76.6066, "Asia/Kolkata"],
+["Hisar, Haryana, India", 29.1492, 75.7217, "Asia/Kolkata"],
+["Panipat, Haryana, India", 29.3909, 76.9635, "Asia/Kolkata"],
+["Karnal, Haryana, India", 29.6857, 76.9905, "Asia/Kolkata"],
+["Ambala, Haryana, India", 30.3782, 76.7767, "Asia/Kolkata"],
+["Sonipat, Haryana, India", 28.9288, 77.0913, "Asia/Kolkata"],
+["Kurukshetra, Haryana, India", 29.9695, 76.8783, "Asia/Kolkata"],
+["Bathinda, Punjab, India", 30.211, 74.9455, "Asia/Kolkata"],
+["Moga, Punjab, India", 30.816, 75.174, "Asia/Kolkata"],
+["Nainital, Uttarakhand, India", 29.3919, 79.4542, "Asia/Kolkata"],
+["Haldwani, Uttarakhand, India", 29.2183, 79.513, "Asia/Kolkata"],
+["Roorkee, Uttarakhand, India", 29.8543, 77.888, "Asia/Kolkata"],
+["Nathdwara, Rajasthan, India", 24.938, 73.8236, "Asia/Kolkata"],
+["Mahabaleshwar, Maharashtra, India", 17.9237, 73.6586, "Asia/Kolkata"],
+["Alwar, Rajasthan, India", 27.553, 76.6346, "Asia/Kolkata"],
+["Sikar, Rajasthan, India", 27.6094, 75.1399, "Asia/Kolkata"],
+["Bhilwara, Rajasthan, India", 25.3463, 74.6364, "Asia/Kolkata"],
+["Srinagar (Garhwal), Uttarakhand, India", 30.222, 78.784, "Asia/Kolkata"],
+["Saharanpur, Uttar Pradesh, India", 29.968, 77.546, "Asia/Kolkata"],
+["Firozabad, Uttar Pradesh, India", 27.1591, 78.3957, "Asia/Kolkata"],
+["Etawah, Uttar Pradesh, India", 26.7855, 79.0215, "Asia/Kolkata"],
+["Sultanpur, Uttar Pradesh, India", 26.2648, 82.0727, "Asia/Kolkata"],
+["Azamgarh, Uttar Pradesh, India", 26.0685, 83.1859, "Asia/Kolkata"],
+["Mirzapur, Uttar Pradesh, India", 25.1337, 82.5644, "Asia/Kolkata"],
+["Raebareli, Uttar Pradesh, India", 26.2345, 81.2409, "Asia/Kolkata"],
+["Hapur, Uttar Pradesh, India", 28.7306, 77.7759, "Asia/Kolkata"],
+["Muzaffarnagar, Uttar Pradesh, India", 29.4727, 77.7085, "Asia/Kolkata"],
+["Kathmandu, Nepal", 27.7172, 85.324, "Asia/Kathmandu"],
+["Pokhara, Nepal", 28.2096, 83.9856, "Asia/Kathmandu"],
+["Thimphu, Bhutan", 27.4728, 89.639, "Asia/Thimphu"],
+["Colombo, Sri Lanka", 6.9271, 79.8612, "Asia/Colombo"],
+["Kandy, Sri Lanka", 7.2906, 80.6337, "Asia/Colombo"],
+["Dhaka, Bangladesh", 23.8103, 90.4125, "Asia/Dhaka"],
+["Chittagong, Bangladesh", 22.3569, 91.7832, "Asia/Dhaka"],
+["Karachi, Pakistan", 24.8607, 67.0011, "Asia/Karachi"],
+["Lahore, Pakistan", 31.5204, 74.3587, "Asia/Karachi"],
+["Islamabad, Pakistan", 33.6844, 73.0479, "Asia/Karachi"],
+["Kabul, Afghanistan", 34.5553, 69.2075, "Asia/Kabul"],
+["Male, Maldives", 4.1755, 73.5093, "Indian/Maldives"],
+["Dubai, UAE", 25.2048, 55.2708, "Asia/Dubai"],
+["Abu Dhabi, UAE", 24.4539, 54.3773, "Asia/Dubai"],
+["Doha, Qatar", 25.2854, 51.531, "Asia/Qatar"],
+["Riyadh, Saudi Arabia", 24.7136, 46.6753, "Asia/Riyadh"],
+["Jeddah, Saudi Arabia", 21.4858, 39.1925, "Asia/Riyadh"],
+["Muscat, Oman", 23.588, 58.3829, "Asia/Muscat"],
+["Kuwait City, Kuwait", 29.3759, 47.9774, "Asia/Kuwait"],
+["Manama, Bahrain", 26.2285, 50.586, "Asia/Bahrain"],
+["Tehran, Iran", 35.6892, 51.389, "Asia/Tehran"],
+["Baghdad, Iraq", 33.3152, 44.3661, "Asia/Baghdad"],
+["Istanbul, Turkey", 41.0082, 28.9784, "Europe/Istanbul"],
+["Tel Aviv, Israel", 32.0853, 34.7818, "Asia/Jerusalem"],
+["Cairo, Egypt", 30.0444, 31.2357, "Africa/Cairo"],
+["Singapore", 1.3521, 103.8198, "Asia/Singapore"],
+["Kuala Lumpur, Malaysia", 3.139, 101.6869, "Asia/Kuala_Lumpur"],
+["Bangkok, Thailand", 13.7563, 100.5018, "Asia/Bangkok"],
+["Jakarta, Indonesia", -6.2088, 106.8456, "Asia/Jakarta"],
+["Manila, Philippines", 14.5995, 120.9842, "Asia/Manila"],
+["Hanoi, Vietnam", 21.0278, 105.8342, "Asia/Bangkok"],
+["Ho Chi Minh City, Vietnam", 10.8231, 106.6297, "Asia/Ho_Chi_Minh"],
+["Hong Kong", 22.3193, 114.1694, "Asia/Hong_Kong"],
+["Beijing, China", 39.9042, 116.4074, "Asia/Shanghai"],
+["Shanghai, China", 31.2304, 121.4737, "Asia/Shanghai"],
+["Tokyo, Japan", 35.6762, 139.6503, "Asia/Tokyo"],
+["Seoul, South Korea", 37.5665, 126.978, "Asia/Seoul"],
+["Taipei, Taiwan", 25.033, 121.5654, "Asia/Taipei"],
+["Sydney, Australia", -33.8688, 151.2093, "Australia/Sydney"],
+["Melbourne, Australia", -37.8136, 144.9631, "Australia/Melbourne"],
+["Perth, Australia", -31.9505, 115.8605, "Australia/Perth"],
+["Auckland, New Zealand", -36.8485, 174.7633, "Pacific/Auckland"],
+["London, UK", 51.5074, -0.1278, "Europe/London"],
+["Birmingham, UK", 52.4862, -1.8904, "Europe/London"],
+["Manchester, UK", 53.4808, -2.2426, "Europe/London"],
+["Leicester, UK", 52.6369, -1.1398, "Europe/London"],
+["Dublin, Ireland", 53.3498, -6.2603, "Europe/Dublin"],
+["Paris, France", 48.8566, 2.3522, "Europe/Paris"],
+["Berlin, Germany", 52.52, 13.405, "Europe/Berlin"],
+["Frankfurt, Germany", 50.1109, 8.6821, "Europe/Berlin"],
+["Amsterdam, Netherlands", 52.3676, 4.9041, "Europe/Amsterdam"],
+["Brussels, Belgium", 50.8503, 4.3517, "Europe/Brussels"],
+["Zurich, Switzerland", 47.3769, 8.5417, "Europe/Zurich"],
+["Madrid, Spain", 40.4168, -3.7038, "Europe/Madrid"],
+["Rome, Italy", 41.9028, 12.4964, "Europe/Rome"],
+["Lisbon, Portugal", 38.7223, -9.1393, "Europe/Lisbon"],
+["Stockholm, Sweden", 59.3293, 18.0686, "Europe/Stockholm"],
+["Oslo, Norway", 59.9139, 10.7522, "Europe/Oslo"],
+["Copenhagen, Denmark", 55.6761, 12.5683, "Europe/Copenhagen"],
+["Vienna, Austria", 48.2082, 16.3738, "Europe/Vienna"],
+["Warsaw, Poland", 52.2297, 21.0122, "Europe/Warsaw"],
+["Moscow, Russia", 55.7558, 37.6173, "Europe/Moscow"],
+["Athens, Greece", 37.9838, 23.7275, "Europe/Athens"],
+["New York, USA", 40.7128, -74.006, "America/New_York"],
+["Washington DC, USA", 38.9072, -77.0369, "America/New_York"],
+["Boston, USA", 42.3601, -71.0589, "America/New_York"],
+["Atlanta, USA", 33.749, -84.388, "America/New_York"],
+["Miami, USA", 25.7617, -80.1918, "America/New_York"],
+["Chicago, USA", 41.8781, -87.6298, "America/Chicago"],
+["Houston, USA", 29.7604, -95.3698, "America/Chicago"],
+["Dallas, USA", 32.7767, -96.797, "America/Chicago"],
+["Denver, USA", 39.7392, -104.9903, "America/Denver"],
+["Phoenix, USA", 33.4484, -112.074, "America/Phoenix"],
+["Los Angeles, USA", 34.0522, -118.2437, "America/Los_Angeles"],
+["San Francisco, USA", 37.7749, -122.4194, "America/Los_Angeles"],
+["San Jose, USA", 37.3382, -121.8863, "America/Los_Angeles"],
+["Seattle, USA", 47.6062, -122.3321, "America/Los_Angeles"],
+["Edison (New Jersey), USA", 40.5187, -74.4121, "America/New_York"],
+["Toronto, Canada", 43.6532, -79.3832, "America/Toronto"],
+["Vancouver, Canada", 49.2827, -123.1207, "America/Vancouver"],
+["Montreal, Canada", 45.5017, -73.5673, "America/Toronto"],
+["Mexico City, Mexico", 19.4326, -99.1332, "America/Mexico_City"],
+["Sao Paulo, Brazil", -23.5505, -46.6333, "America/Sao_Paulo"],
+["Buenos Aires, Argentina", -34.6037, -58.3816, "America/Argentina/Buenos_Aires"],
+["Nairobi, Kenya", -1.2921, 36.8219, "Africa/Nairobi"],
+["Lagos, Nigeria", 6.5244, 3.3792, "Africa/Lagos"],
+["Johannesburg, South Africa", -26.2041, 28.0473, "Africa/Johannesburg"],
+["Cape Town, South Africa", -33.9249, 18.4241, "Africa/Johannesburg"],
+["Port Louis, Mauritius", -20.1609, 57.5012, "Indian/Mauritius"],
+["Suva, Fiji", -18.1248, 178.4501, "Pacific/Fiji"]
 ];
+</script>
+<script>/* Place search: instant offline matches (built-in list + full offline city dataset) + live worldwide lookup (Open-Meteo geocoding; only the typed place name is sent). */
+(function () {
+  const norm = s => String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim();
+  const offline = () => (window.CITIES || []).map(c => ({ label: c[0], lat: c[1], lon: c[2], tz: c[3], src: 'built-in', key: norm(c[0]) }));
+  let cache = null;
+
+  // ---- full offline dataset: data/cities/index.json + per-country files, loaded lazily in the background (India first)
+  const DATA = {};      // iso -> { name, tz[], s[], c[], keys[] }
+  let loadStarted = false, loadedCount = 0, totalCount = 0, listeners = [];
+  const fetchJson = u => fetch(u).then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+  async function preload() {
+    if (loadStarted) return; loadStarted = true;
+    try {
+      const index = await fetchJson('data/cities/index.json'); totalCount = index.length;
+      const files = [...new Set(index.map(r => r[3]))].sort((a, b) => (a === 'IN' ? -1 : b === 'IN' ? 1 : 0));
+      const nameOf = {}; index.forEach(r => nameOf[r[0]] = r[1]);
+      for (const f of files) {
+        let obj; try { obj = await fetchJson('data/cities/' + f + '.json'); } catch (e) { continue; }
+        Object.keys(obj).forEach(iso => { const d = obj[iso]; d.name = nameOf[iso] || iso; d.keys = d.c.map(x => norm(x[0])); DATA[iso] = d; loadedCount++; });
+        listeners.forEach(fn => { try { fn(loadedCount, totalCount); } catch (e) {} });
+        await new Promise(r => setTimeout(r, 30));
+      }
+    } catch (e) { /* offline dataset unavailable (for example opened from a file): the built-in list and live search still work */ }
+  }
+  function searchData(n, limit) {
+    const hits = [];
+    for (const iso in DATA) {
+      const d = DATA[iso], pri = iso === 'IN' ? 0 : 0.5;
+      for (let i = 0; i < d.keys.length; i++) {
+        const k = d.keys[i], p = k.indexOf(n); if (p < 0) continue;
+        hits.push({ iso, i, score: (p === 0 ? (k === n ? -1 : 0) : k.includes(' ' + n) ? 1 : 2) + k.length / 1000 + pri });
+      }
+    }
+    hits.sort((a, b) => a.score - b.score);
+    return hits.slice(0, limit).map(h => { const d = DATA[h.iso], x = d.c[h.i]; return { label: [x[0], d.s[x[1]], d.name].filter(Boolean).join(', '), lat: x[2], lon: x[3], tz: d.tz[x[4]], src: 'dataset', key: norm(x[0]) }; });
+  }
+  function searchOffline(q, limit) {
+    const n = norm(q); if (n.length < 2) return [];
+    preload();
+    cache = cache || offline();
+    const hits = [];
+    for (const c of cache) {
+      const i = c.key.indexOf(n); if (i < 0) continue;
+      hits.push({ c, score: (i === 0 ? 0 : c.key.includes(' ' + n) ? 1 : 2) + c.key.length / 1000 });
+    }
+    const built = hits.sort((a, b) => a.score - b.score).slice(0, limit || 8).map(h => h.c);
+    return merge([], built.concat(searchData(n, (limit || 8) + 6)));
+  }
+  async function searchOnline(q, signal) {
+    const n = norm(q); if (n.length < 2) return [];
+    const url = 'https://geocoding-api.open-meteo.com/v1/search?count=10&language=en&format=json&name=' + encodeURIComponent(q.trim());
+    const r = await fetch(url, { signal });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const j = await r.json();
+    return (j.results || []).filter(x => x.timezone && isFinite(x.latitude) && isFinite(x.longitude)).map(x => ({
+      label: [x.name, x.admin1, x.country].filter(Boolean).join(', '), lat: +x.latitude.toFixed(4), lon: +x.longitude.toFixed(4), tz: x.timezone, src: 'worldwide', pop: x.population || 0 }));
+  }
+  function merge(online, off) {
+    const out = [], cityKey = c => norm(String(c.label).split(',')[0].replace(/\(.*?\)/g, ''));
+    [...online, ...off].forEach(c => {
+      const ck = cityKey(c);
+      if (!out.some(o => cityKey(o) === ck && Math.abs(o.lat - c.lat) < 0.3 && Math.abs(o.lon - c.lon) < 0.3)) out.push(c);
+    });
+    return out.slice(0, 14);
+  }
+  window.Geo = { searchOffline, searchOnline, merge, norm, preload, onProgress: fn => listeners.push(fn), stats: () => ({ loadedCount, totalCount }) };
+  setTimeout(preload, 800);
+})();
 </script>
 <script>(function () {
   const E = window.VedicEngine, $ = id => document.getElementById(id);
@@ -900,14 +1346,38 @@ window.CITIES = [
   let chart = null;
 
   // ----- setup -----
-  const dl = $('cities');
-  window.CITIES.forEach(c => { const o = document.createElement('option'); o.value = c[0]; dl.appendChild(o); });
-  const tzs = (Intl.supportedValuesOf ? Intl.supportedValuesOf('timeZone') : ['Asia/Kolkata','UTC']);
-  tzs.forEach(z => { const o = document.createElement('option'); o.value = z; $('tzs').appendChild(o); });
+  const tzs = (Intl.supportedValuesOf ? Intl.supportedValuesOf('timeZone') : ['Asia/Kolkata', 'UTC']);
+  { const dl = document.createElement('datalist'); dl.id = 'tzs'; tzs.forEach(z => { const o = document.createElement('option'); o.value = z; dl.appendChild(o); }); document.body.appendChild(dl); $('tz').setAttribute('list', 'tzs'); }
+  // --- place search: instant built-in matches, then live worldwide results
+  let placeItems = [], placeSel = -1, placeTimer = null, placeAbort = null;
+  function showPlaces() {
+    const ul = $('placeList'); ul.innerHTML = '';
+    placeItems.forEach((c, i) => { const li = document.createElement('li'); li.role = 'option'; li.setAttribute('aria-selected', i === placeSel ? 'true' : 'false'); li.innerHTML = `<span>${esc(c.label)}</span><small>${c.lat.toFixed(2)}, ${c.lon.toFixed(2)}</small>`; li.addEventListener('mousedown', e => { e.preventDefault(); pickPlace(c); }); ul.appendChild(li); });
+    ul.hidden = !placeItems.length; $('place').setAttribute('aria-expanded', String(!ul.hidden));
+  }
+  function pickPlace(c) {
+    $('place').value = c.label; $('lat').value = c.lat; $('lon').value = c.lon; $('tz').value = c.tz;
+    placeItems = []; showPlaces(); $('placeMsg').textContent = `Using ${c.label}: latitude ${c.lat}, longitude ${c.lon}, time zone ${c.tz}.`;
+  }
   $('place').addEventListener('input', () => {
-    const c = window.CITIES.find(x => x[0] === $('place').value);
-    if (c) { $('lat').value = c[1]; $('lon').value = c[2]; $('tz').value = c[3]; }
+    const q = $('place').value; clearTimeout(placeTimer); if (placeAbort) placeAbort.abort();
+    const off = window.Geo.searchOffline(q, 8); placeItems = off; placeSel = -1; showPlaces();
+    if (window.Geo.norm(q).length < 2) { $('placeMsg').textContent = ''; return; }
+    $('placeMsg').textContent = 'Searching worldwide…';
+    placeTimer = setTimeout(async () => {
+      placeAbort = new AbortController();
+      try { const on = await window.Geo.searchOnline(q, placeAbort.signal); if ($('place').value !== q) return; placeItems = window.Geo.merge(on, off); placeSel = -1; showPlaces(); $('placeMsg').textContent = on.length ? `${on.length} worldwide match${on.length > 1 ? 'es' : ''}. Choose one, or fill the coordinates yourself.` : (off.length ? 'No worldwide match; showing the built-in list.' : 'No match found. Enter latitude, longitude and time zone yourself.'); }
+      catch (e) { if (e.name === 'AbortError') return; $('placeMsg').textContent = off.length ? 'Live worldwide search is unavailable here; showing the built-in list.' : 'Live search is unavailable. Enter latitude, longitude and time zone yourself.'; }
+    }, 350);
   });
+  $('place').addEventListener('keydown', e => {
+    if (!placeItems.length) return;
+    if (e.key === 'ArrowDown') { placeSel = (placeSel + 1) % placeItems.length; showPlaces(); e.preventDefault(); }
+    else if (e.key === 'ArrowUp') { placeSel = (placeSel - 1 + placeItems.length) % placeItems.length; showPlaces(); e.preventDefault(); }
+    else if (e.key === 'Enter' && placeSel >= 0) { pickPlace(placeItems[placeSel]); e.preventDefault(); }
+    else if (e.key === 'Escape') { placeItems = []; showPlaces(); }
+  });
+  $('place').addEventListener('blur', () => setTimeout(() => { placeItems = []; showPlaces(); }, 120));
   try { const s = JSON.parse(localStorage.getItem('jyotish-last') || 'null'); if (s) Object.keys(s).forEach(k => $(k) && ($(k).value = s[k])); } catch (e) {}
 
   $('form').addEventListener('submit', ev => {
@@ -965,7 +1435,7 @@ window.CITIES = [
       const here = bodies.filter(b => b.sign === sign).map(b => b.label);
       s += `<polygon points="${h.p}" fill="${i === 0 ? 'color-mix(in srgb,var(--gold) 14%,transparent)' : 'none'}" stroke="var(--gold)" stroke-width="1.5"/>`;
       s += `<text x="${h.s[0]}" y="${h.s[1]}" text-anchor="middle" font-size="13" fill="var(--mute)">${sign + 1}</text>`;
-      const per = [0,3,6,9].includes(i) ? 3 : 2, fs = here.length > 4 ? 12 : 14, lh = fs + 3;
+      const lng = bodies.some(b => b.label.length > 4), per = [0,3,6,9].includes(i) ? (lng ? 2 : 3) : 2, fs = lng ? (here.length > 4 ? 10 : 11.5) : (here.length > 4 ? 12 : 14), lh = fs + 3;
       const rows = []; for (let k = 0; k < here.length; k += per) rows.push(here.slice(k, k + per).join(' '));
       rows.forEach((r, k) => s += `<text x="${h.t[0]}" y="${h.t[1] + (k - (rows.length - 1) / 2) * lh + 5}" text-anchor="middle" font-size="${fs}" font-weight="600" fill="var(--accent2)">${esc(r)}</text>`);
     });
@@ -980,8 +1450,9 @@ window.CITIES = [
       if (sign === lagnaSign) s += `<line x1="${x}" y1="${y}" x2="${x + 18}" y2="${y}" stroke="var(--accent)" stroke-width="3"/><line x1="${x}" y1="${y}" x2="${x}" y2="${y + 18}" stroke="var(--accent)" stroke-width="3"/>`;
       s += `<text x="${x + 50}" y="${y + 14}" text-anchor="middle" font-size="11" fill="var(--mute)">${E.SIGNS[sign].slice(0, 3)}${sign === lagnaSign ? ' · Asc' : ''}</text>`;
       const here = bodies.filter(b => b.sign === sign).map(b => b.label);
+      const lng = bodies.some(b => b.label.length > 4), fz = lng ? 12 : 15;
       const rows = []; for (let k = 0; k < here.length; k += 2) rows.push(here.slice(k, k + 2).join(' '));
-      rows.forEach((r, k) => s += `<text x="${x + 50}" y="${y + 52 + (k - (rows.length - 1) / 2) * 18}" text-anchor="middle" font-size="15" font-weight="600" fill="var(--accent2)">${esc(r)}</text>`);
+      rows.forEach((r, k) => s += `<text x="${x + 50}" y="${y + 52 + (k - (rows.length - 1) / 2) * (fz + 3)}" text-anchor="middle" font-size="${fz}" font-weight="600" fill="var(--accent2)">${esc(r)}</text>`);
     }
     return s + '</svg>';
   }
@@ -1010,7 +1481,7 @@ window.CITIES = [
   function drawCharts() {
     if (!chart) return;
     drawGallery();
-    if (typeof drawAV === 'function' && AV) { drawAV(); renderGochar($('gDate').value ? Date.UTC(...$('gDate').value.split('-').map((x, i) => i === 1 ? x - 1 : +x), 6, 30) : Date.now()); }
+    if (typeof drawAV === 'function' && AV) { drawAV(); renderGochar(curGDate()); }
     const style = document.querySelector('input[name=style]:checked').value, f = style === 'north' ? northSvg : southSvg;
     [['vSel1','d1','vNote1'],['vSel2','d9','vNote2']].forEach(([sel, box, note]) => {
       const n = +$(sel).value;
@@ -1148,18 +1619,31 @@ window.CITIES = [
   }
 
   function renderGochar(ms) {
-    const g = E.computeGochar(chart, ms), style = document.querySelector('input[name=style]:checked').value, f = style === 'north' ? northSvg : southSvg;
+    const g = E.computeGochar(chart, ms), style = document.querySelector('input[name=style]:checked').value, f = style === 'north' ? northSvg : southSvg, showDeg = $('gDeg').checked;
     $('gSade').innerHTML = `<b>Saturn status on ${new Date(ms).toLocaleDateString()}:</b> ${g.sadeSati}`;
-    $('gChart').innerHTML = f(chart.lagna.sign, g.planets.map(p => ({ sign: p.sign, label: ABBR[p.key] + (p.retro && !['Rahu','Ketu'].includes(p.key) ? '℞' : '') })));
+    const rx = p => p.retro && !['Rahu','Ketu'].includes(p.key) ? '℞' : '';
+    $('gChart').innerHTML = f(chart.lagna.sign, g.planets.map(p => ({ sign: p.sign, label: ABBR[p.key] + rx(p) + (showDeg ? ' ' + Math.floor(p.deg) + '°' : '') })));
+    const nav = p => { const w = 30 / 9; return { sign: E.vargaSign(p.lon, 9), deg: ((p.deg % w) / w) * 30 }; };
+    $('gChart9').innerHTML = f(E.vargaSign(chart.lagna.lon, 9), g.planets.map(p => { const n = nav(p); return { sign: n.sign, label: ABBR[p.key] + rx(p) + (showDeg ? ' ' + Math.floor(n.deg) + '°' : '') }; }));
     const rows = g.planets.filter(p => BL.SEVEN.includes(p.key));
     $('gBars').innerHTML = `<h2>Transit strength (Ashtakavarga)</h2><p class="hint">For each planet, the bindus it holds in its own Bhinnashtakavarga for the sign it is transiting, as a percentage of 8. Five or more is favourable, four is neutral, three or fewer is testing.</p>` + rows.map(p => {
       const v = AV.bav[p.key].signs[p.sign], pc = Math.round(v / 8 * 100), sv = AV.sav[p.sign];
-      return `<div class="hb"><span class="nm">${p.key}</span><div class="tr"><i class="fill ${toneOf(v, 5, 4)}" style="left:0;width:${pc}%"></i><span class="mk" style="left:50%"></span></div><span class="val">${v}/8 · ${pc}%</span><span class="sub">in ${p.signName} (your ${P.ord(p.fromLagna)} house, ${P.ord(p.fromMoon)} from Moon) · sign total ${sv}/56 = ${Math.round(sv / 56 * 100)}%${p.retro && !['Rahu','Ketu'].includes(p.key) ? ' · retrograde' : ''}</span></div>`;
+      return `<div class="hb"><span class="nm">${p.key}</span><div class="tr"><i class="fill ${toneOf(v, 5, 4)}" style="left:0;width:${pc}%"></i><span class="mk" style="left:50%"></span></div><span class="val">${v}/8 · ${pc}%</span><span class="sub">${fmtDeg(p.deg)} ${p.signName} (your ${P.ord(p.fromLagna)} house, ${P.ord(p.fromMoon)} from Moon) · sign total ${sv}/56 = ${Math.round(sv / 56 * 100)}%${p.retro && !['Rahu','Ketu'].includes(p.key) ? ' · retrograde' : ''}</span></div>`;
     }).join('');
-    $('gochar').innerHTML = `<h2>Transit positions</h2><table><thead><tr><th>Planet</th><th>Sign</th><th>Degree</th><th>Nakshatra</th><th>House from Lagna</th><th>House from Moon</th><th>Bindus</th></tr></thead><tbody>` +
-      g.planets.map(p => `<tr><td><b>${p.key}</b>${p.retro && !['Rahu','Ketu'].includes(p.key) ? ' ℞' : ''}</td><td>${p.signName}</td><td>${fmtDeg(p.deg)}</td><td>${p.nakshatra}</td><td>${p.fromLagna}</td><td>${p.fromMoon}</td><td>${BL.SEVEN.includes(p.key) ? AV.bav[p.key].signs[p.sign] + '/8' : '–'}</td></tr>`).join('') + `</tbody></table>`;
+    $('gRead').innerHTML = `<h2>What each transit is touching</h2><p class="hint">Read by the house the planet occupies from your Lagna and from your Moon, plus its Ashtakavarga support.</p>` + RD.transits(chart, g).map(t => `<div class="rcard"><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><b>${esc(t.headline)}</b><span class="tag ${t.tone === 'good' ? 'good' : t.tone === 'bad' ? 'bad' : 'mid'}">${t.tone === 'good' ? 'Supportive' : t.tone === 'bad' ? 'Testing' : 'Neutral'}</span></div><p class="rtext">${esc(t.text)}</p></div>`).join('');
+    $('gochar').innerHTML = `<h2>Transit positions</h2><table><thead><tr><th>Planet</th><th>Sign</th><th>Degree</th><th>Nakshatra</th><th>Navamsa (D9)</th><th>House from Lagna</th><th>House from Moon</th><th>Bindus</th></tr></thead><tbody>` +
+      g.planets.map(p => `<tr><td><b>${p.key}</b>${rx(p) ? ' ℞' : ''}</td><td>${p.signName}</td><td>${fmtDeg(p.deg)}</td><td>${p.nakshatra}, pada ${p.pada}</td><td>${E.SIGNS[nav(p).sign]} ${fmtDeg(nav(p).deg)}</td><td>${p.fromLagna}</td><td>${p.fromMoon}</td><td>${BL.SEVEN.includes(p.key) ? AV.bav[p.key].signs[p.sign] + '/8' : '–'}</td></tr>`).join('') + `</tbody></table>`;
   }
-  $('gDate').addEventListener('change', () => { if (chart && $('gDate').value) { const [y, m, d] = $('gDate').value.split('-').map(Number); renderGochar(Date.UTC(y, m - 1, d, 6, 30)); } });
+  const RD = window.Reading;
+  $('gDeg').addEventListener('change', () => { if (chart) renderGochar(curGDate()); });
+  function curGDate() { return $('gDate').value ? Date.UTC(...$('gDate').value.split('-').map((x, i) => i === 1 ? x - 1 : +x), 6, 30) : Date.now(); }
+  function renderReadings() {
+    const pl = RD.planets(chart), hs = RD.houses(chart);
+    $('rdIntro').innerHTML = `<h2>Readings by placement</h2><p class="ptext">Each planet is read by the sign it occupies (own, friend or enemy sign), its house and house type, dignity, retrogression, conjunctions, aspects received, the houses it rules, its nakshatra and its Ashtakavarga support. Each house is read by its sign, lord, occupants, aspects and Sarvashtakavarga bindus. These are rule-based classical significations for reflection, not a consultation.</p>`;
+    $('rdPlanets').innerHTML = `<h2>Planets</h2>` + pl.map((p, i) => `<details class="rcard" ${i < 2 ? 'open' : ''}><summary><span>${esc(p.headline)}</span><span class="tag ${p.score >= 0.5 ? 'good' : p.score <= -0.5 ? 'bad' : 'mid'}">${p.strength} · ${p.score > 0 ? '+' : ''}${p.score}</span></summary><dl>${p.parts.map(x => `<dt>${x.h}</dt><dd>${esc(x.t)}</dd>`).join('')}</dl></details>`).join('');
+    $('rdHouses').innerHTML = `<h2>Houses</h2>` + hs.map(h => `<details class="rcard"><summary><span>${P.ord(h.house)} house · ${h.sign} · lord ${h.lord}</span><span class="tag ${h.tone}">${h.sav} bindus</span></summary><p class="rtext">${esc(h.text)}</p></details>`).join('');
+  }
+  $('gDate').addEventListener('change', () => { if (chart && $('gDate').value) renderGochar(curGDate()); });
 
   // ----- tables & text -----
   function render() {
@@ -1190,6 +1674,7 @@ window.CITIES = [
     $('yogas').innerHTML = `<h2>Yogas &amp; doshas</h2>` + c.yogas.map(y => `<div class="yoga"><b>${y.name}</b> <span class="tag ${y.present ? (/dosha|sarp/i.test(y.name) ? 'bad' : 'good') : ''}">${y.present ? 'Present' : 'Absent'}</span><div class="hint">${esc(y.detail)}</div></div>`).join('') + `<p class="hint">Rule-based checks only; classical judgement also weighs strength, aspects and cancellations.</p>`;
 
     renderBala();
+    renderReadings();
     const t = new Date(); $('gDate').value = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`;
     renderGochar(now);
   }
