@@ -15,6 +15,9 @@ Zero dependencies. Needs only Node.js 18+ (https://nodejs.org).
 - Panchang at birth (tithi, vara, nakshatra, yoga, karana)
 - Yogas/doshas: Manglik, Kaal Sarp, Gajakesari, Budhaditya, Chandra-Mangala, Pancha Mahapurusha
 - Current transits (Gochar) with Sade Sati / Shani Dhaiya status
+- Shadbala (six-fold planetary strength) with stacked rupa bars, percent-of-requirement bars, full component table, Ishta/Kashta phala
+- Ashtakavarga: Sarvashtakavarga + Bhinnashtakavarga for 7 planets as charts (North/South), bar charts with percentages, heat table (verified totals 48/49/39/54/56/52/39 = 337)
+- Transit charts: pick any date; transit chart over your natal Lagna plus Ashtakavarga-based percentage bars
 - Life Predictions: lifetime outlook timeline combining Vimshottari + Yogini Dasha with Jupiter and Saturn transits, period-by-period explanations, year-by-year table, Sade Sati bands
 
 ## Method
@@ -29,8 +32,11 @@ public/engine.js (all calculations) · public/app.js (UI/SVG charts) · public/c
 Ashtakoota Gun Milan (marriage matching), Ashtakavarga, Shadbala, divisional charts D2–D60, sunrise-based Vara, true node, more cities / geocoding API.
 
 ## Using a different hostname / sharing
-- `node server.js` now listens on all network interfaces and prints the addresses, e.g. `http://192.168.1.20:3000` (phones/laptops on the same Wi-Fi) and `http://<computer-name>:3000`.
+- `node server.js` listens on this computer only (safe default). `npm run lan` (or `HOST=0.0.0.0 node server.js`) shares it on your Wi-Fi and prints the addresses, e.g. `http://192.168.1.20:3000` (phones/laptops on the same Wi-Fi) and `http://<computer-name>:3000`.
 - Custom name such as `http://jyotish.local`: add `127.0.0.1  jyotish.local` to your hosts file
   (Windows: C:\Windows\System32\drivers\etc\hosts, edit as Administrator; Mac/Linux: /etc/hosts, use sudo), then run with `PORT=80 node server.js` (Windows PowerShell: `$env:PORT=80; node server.js`) and open http://jyotish.local
 - Only this computer: `HOST=127.0.0.1 node server.js`
 - Public website: run `node build-single.js`, then upload `dist/jyotish-kundli.html` (rename to index.html) to any static host (Netlify Drop, GitHub Pages, Cloudflare Pages, Vercel). No server needed; everything runs in the browser.
+
+## Security
+See SECURITY.md. The server is read-only, sends strict security headers and listens on localhost by default.

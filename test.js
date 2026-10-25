@@ -27,4 +27,14 @@ const okR = r.years.length === 90 && r.months.length === 1080 && r.years.every(a
 console.log(okR ? 'PASS' : 'FAIL', 'timeline', r.years.length, 'yrs; now:', r.now.vMD + '-' + r.now.vAD, '|', r.now.yMDName, '| J house', r.now.jH, 'S house', r.now.sH, 'score', r.now.score);
 console.log('Sade Sati bands (ages):', r.sade.map(b => b.from.toFixed(1) + '–' + b.to.toFixed(1)).join(', '));
 if (!okR) process.exit(1);
+// ---- shadbala + ashtakavarga
+const B = require('./public/bala.js');
+const av = B.ashtakavarga(c2);
+const okAV = Object.values(av.bav).every(b => b.total === b.expected) && av.savTotal === 337;
+console.log(okAV ? 'PASS' : 'FAIL', 'Ashtakavarga totals', Object.entries(av.bav).map(([k, b]) => k + ':' + b.total).join(' '), 'SAV', av.savTotal);
+const sb = B.shadbala(c2);
+sb.order.forEach(k => { const r = sb.planets[k]; console.log(k.padEnd(8), 'sthana', r.sthana.toFixed(0), 'dig', r.dig.toFixed(0), 'kala', r.kala.toFixed(0), 'cheshta', r.cheshta.toFixed(0), 'naisa', r.naisargika.toFixed(0), 'drik', r.drik.toFixed(0), '=> rupas', r.rupas.toFixed(2), r.percent + '%', r.label); });
+console.log('meta', JSON.stringify(sb.meta), 'MC', c2.mcLon.toFixed(1));
+const okSB = sb.order.every(k => isFinite(sb.planets[k].total) && sb.planets[k].rupas > 1 && sb.planets[k].rupas < 15);
+console.log(okSB ? 'PASS' : 'FAIL', 'shadbala sane'); if (!okAV || !okSB) fail++;
 process.exit(fail ? 1 : 0);
