@@ -48,4 +48,7 @@ Keep this attribution if you share the data files; the ODbL requires derived dat
 Rare small villages may be missing: enter latitude, longitude and time zone by hand for those.
 
 ## Reports tab (added)
-Kundli analysis, Marriage compatibility (Ashtakoota 36 points + Manglik + timing), Career and finance, Numerology, Yearly horoscope (Varsha chart, Muntha, monthly outlook). Files: `public/koota.js`, `numerology.js`, `reports.js`, `sections.js`.
+Kundli analysis, Marriage compatibility (Ashtakoota 36 points + Manglik + timing), Career and finance, Numerology, Yearly horoscope (Varsha chart, Muntha, monthly outlook). Files: `public/koota.js`, `numerology.js`, `reports.js`, `texts.js`, `sections.js`. Navigation is two rows of sea-blue tabs (`public/nav.js`): Birth Chart, Predictions, Strength, Reports.
+
+## Icon
+`public/icon-*.png`, `apple-touch-icon.png` and `manifest.webmanifest` come from your supplied icon (favicon, phone home-screen icon, header logo, share image). The single-file build embeds the header logo.
