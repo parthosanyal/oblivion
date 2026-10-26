@@ -62,9 +62,9 @@ if (!okRD) fail++;
   ok(n.lifePath === 9 && n.mulank === 3 && n.bhagyank === 9, 'numerology: 21-05-1999 -> LP 9, Mulank 3, Bhagyank 9');
   ok(N.reduce(29, true) === 11 && N.reduce(28, true) === 1 && N.reduce(22, true) === 22, 'numerology: master numbers kept');
   const pr = Pr.compute(a, Date.now());
-  ['kundli', 'career'].forEach(f => ok(R[f](a, pr).points.length === 7 && !R[f](a, pr).points.some(p => /undefined|NaN/.test(p.html)), 'reports: ' + f));
+  ['kundli', 'career'].forEach(f => ok(R[f](a, pr).points.length === 10 && !R[f](a, pr).points.some(p => /undefined|NaN/.test(p.html)), 'reports: ' + f));
   const y = R.yearly(a, pr, 2026);
-  ok(y.points.length === 6 && !y.points.some(p => /undefined|NaN/.test(p.html)), 'reports: yearly');
+  ok(y.points.length === 8 && !y.points.some(p => /undefined|NaN/.test(p.html)), 'reports: yearly');
   const sunN = a.planets.find(p => p.key === 'Sun').lon, sunV = y.varsha.planets.find(p => p.key === 'Sun').lon;
   ok(Math.abs(((sunN - sunV + 540) % 360) - 180) < 0.01, 'varsha: Sun returns to natal longitude');
 }
