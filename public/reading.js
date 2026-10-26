@@ -87,5 +87,5 @@
         tone: bind == null ? 'mid' : bind >= 5 ? 'good' : bind === 4 ? 'mid' : 'bad' };
     });
   }
-  return { planets, houses, transits, PH };
+  return { planets, houses, transits, PH, aspectsOn, HTYPE, signRelation, join };
 });
