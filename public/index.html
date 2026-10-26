@@ -57,6 +57,7 @@
     <div class="card summary" id="summary"></div>
     <nav class="tabs" id="tabs">
       <button data-tab="chart" class="on">Charts</button>
+      <button data-tab="reports">Reports</button>
       <button data-tab="planets">Planets</button>
       <button data-tab="vargas">All Charts D1–D60</button>
       <button data-tab="dasha">Dasha</button>
@@ -82,6 +83,10 @@
         <figure class="card"><figcaption><select id="vSel2" class="vsel"></select></figcaption><div id="d9"></div><p class="hint" id="vNote2"></p></figure>
       </div>
       <p class="hint">Whole-sign houses. In the North Indian style houses are fixed (top = 1st house) and the small number is the sign; in the South Indian style signs are fixed and “Asc” marks the Lagna.</p>
+    </div>
+    <div class="tab" id="tab-reports" hidden>
+      <div class="rsw" id="repSwitch" role="tablist" aria-label="Report type"></div>
+      <div id="repBody"></div>
     </div>
     <div class="tab" id="tab-planets" hidden><div class="card scroll" id="planetsTable"></div></div>
     <div class="tab" id="tab-vargas" hidden><p class="hint">Every divisional chart from D1 to D60, each drawn independently. Click a chart to enlarge it.</p><div class="gallery" id="vargas"></div></div>
@@ -135,8 +140,10 @@
       <li>Lagna and Navamsa charts, plus every divisional chart from D1 to D60, in North and South Indian styles</li>
       <li>Vimshottari and Yogini Dasha with Antardasha dates and a lifetime outlook timeline</li>
       <li>Shadbala planetary strength with percentages, and Sarvashtakavarga and Bhinnashtakavarga charts</li>
+      <li>Reports: Kundli analysis, marriage compatibility (Ashtakoota), career and finance, numerology and a yearly horoscope with a Varsha chart</li>
       <li>Panchang, yogas and doshas (Manglik, Kaal Sarp, Gajakesari and more), current transits and Sade Sati</li>
     </ul>
+    <p class="hint">Marriage matching uses the Ashtakoota tables as published by common sources: Varna by Moon sign; Vashya and Gana read bride-by-groom; Tara by nakshatra count; Yoni simplified to same animal 4, sworn enemies 0, others 2; Graha Maitri by natural friendship; Bhakoot 2/12, 5/9 and 6/8 score 0; Nadi same scores 0. Sources differ slightly on Vashya, Gana direction and Yoni, so scores can differ from other calculators.</p>
     <p class="hint">All calculations run in your browser. Your birth date and time are not sent to any server; only a place name you type is looked up to find coordinates. Results are for learning and reflection, not professional advice.</p>
   </section>
 </main>
@@ -146,8 +153,12 @@
 <script src="predict.js"></script>
 <script src="bala.js"></script>
 <script src="reading.js"></script>
+<script src="koota.js"></script>
+<script src="numerology.js"></script>
+<script src="reports.js"></script>
 <script src="cities.js"></script>
 <script src="geo.js"></script>
 <script src="app.js"></script>
+<script src="sections.js"></script>
 </body>
 </html>

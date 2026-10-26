@@ -338,5 +338,8 @@
     renderReadings();
     const t = new Date(); $('gDate').value = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`;
     renderGochar(now);
+    // hook for the Reports tab (sections.js)
+    window.JK = { chart: c, pred, northSvg, southSvg, ABBR, fmtDeg, esc };
+    document.dispatchEvent(new CustomEvent('kundli:ready'));
   }
 })();
