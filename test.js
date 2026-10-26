@@ -46,4 +46,27 @@ console.log('SAMPLE:', pr[4].headline, '=>', pr[4].parts.map(x => x.t).join(' ')
 console.log('SAMPLE:', hr[9].text.slice(0, 300));
 console.log('SAMPLE:', tr[4].headline, '=>', tr[4].text.slice(0, 300));
 if (!okRD) fail++;
+
+// ---- reports modules
+{
+  const K = require('./public/koota.js'), N = require('./public/numerology.js'), R = require('./public/reports.js'), Pr = require('./public/predict.js');
+  const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) process.exitCode = 1; };
+  const a = E.computeChart({ year: 1999, month: 5, day: 21, hour: 17, minute: 25, lat: 28.61, lon: 77.2, tz: 'Asia/Kolkata' });
+  const m = K.match(a, a);
+  ok(m.kootas.length === 8, 'koota: 8 factors');
+  ok(m.kootas.every(k => k.got >= 0 && k.got <= k.max) && m.total <= 36, 'koota: scores within maxima');
+  ok(K.match(a, a).kootas[7].got === 0, 'koota: same chart has same Nadi (0)');
+  ok(K.YONI.length === 27 && K.GANA.length === 27 && K.NADI.length === 27, 'koota: 27 nakshatra rows');
+  ok(K.NADI.filter(x => x === 'Aadi').length === 9 && K.NADI.filter(x => x === 'Madhya').length === 9, 'koota: 9 per Nadi');
+  const n = N.report({ name: 'Rahul Sharma', day: 21, month: 5, year: 1999 }, { now: new Date(2026, 9, 26) });
+  ok(n.lifePath === 9 && n.mulank === 3 && n.bhagyank === 9, 'numerology: 21-05-1999 -> LP 9, Mulank 3, Bhagyank 9');
+  ok(N.reduce(29, true) === 11 && N.reduce(28, true) === 1 && N.reduce(22, true) === 22, 'numerology: master numbers kept');
+  const pr = Pr.compute(a, Date.now());
+  ['kundli', 'career'].forEach(f => ok(R[f](a, pr).points.length === 7 && !R[f](a, pr).points.some(p => /undefined|NaN/.test(p.html)), 'reports: ' + f));
+  const y = R.yearly(a, pr, 2026);
+  ok(y.points.length === 6 && !y.points.some(p => /undefined|NaN/.test(p.html)), 'reports: yearly');
+  const sunN = a.planets.find(p => p.key === 'Sun').lon, sunV = y.varsha.planets.find(p => p.key === 'Sun').lon;
+  ok(Math.abs(((sunN - sunV + 540) % 360) - 180) < 0.01, 'varsha: Sun returns to natal longitude');
+}
+
 process.exit(fail ? 1 : 0);
