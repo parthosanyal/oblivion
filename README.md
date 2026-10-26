@@ -46,3 +46,6 @@ See SECURITY.md. The server is read-only, sends strict security headers and list
 Source: dr5hn/countries-states-cities-database (https://github.com/dr5hn/countries-states-cities-database), licensed under the Open Database Licence (ODbL 1.0).
 Keep this attribution if you share the data files; the ODbL requires derived databases to be shared under the same licence.
 Rare small villages may be missing: enter latitude, longitude and time zone by hand for those.
+
+## Reports tab (added)
+Kundli analysis, Marriage compatibility (Ashtakoota 36 points + Manglik + timing), Career and finance, Numerology, Yearly horoscope (Varsha chart, Muntha, monthly outlook). Files: `public/koota.js`, `numerology.js`, `reports.js`, `sections.js`.
