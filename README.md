@@ -53,3 +53,6 @@ Kundli analysis, Marriage compatibility (Ashtakoota 36 points + Manglik + timing
 ## Icon
 `public/icon-*.png`, `apple-touch-icon.png` and `manifest.webmanifest` come from your supplied icon (favicon, phone home-screen icon, header logo, share image). The single-file build embeds the header logo.
 
+
+## KP astrology
+`public/kp.js` (engine) and `public/kp-ui.js` (screens): Placidus cusps, star/sub/sub-sub lords, significators, cuspal sub-lord analysis, KP Vimshottari periods, ruling planets and the 249 horary table. KP ayanamsa = Lahiri minus 0°05′46″; mean node. `npm test` covers it.
