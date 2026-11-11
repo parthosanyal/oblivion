@@ -82,7 +82,7 @@
       <div class="row2"><label>Partner name<input id="pName" value="${esc(p.name)}" maxlength="60" placeholder="Optional"></label>
       <label>Your chart is the<select id="pRole"><option value="groom"${p.role === 'groom' ? ' selected' : ''}>Groom (boy)</option><option value="bride"${p.role === 'bride' ? ' selected' : ''}>Bride (girl)</option></select></label></div>
       <div class="row2"><label>Partner date of birth<input id="pDate" type="date" value="${esc(p.date)}" required></label><label>Time of birth<input id="pTime" type="time" value="${esc(p.time)}" required></label></div>
-      <div class="combo"><label>Place of birth<input id="pPlace" type="text" aria-controls="pList" value="${esc(p.place)}" placeholder="Start typing any city, town or village" autocomplete="off"></label><ul id="pList" role="listbox" hidden></ul></div>
+      <div class="combo"><label>Place of birth<input id="pPlace" type="text" aria-controls="pPlaceList" value="${esc(p.place)}" placeholder="Start typing any city, town or village" autocomplete="off"></label><ul id="pPlaceList" role="listbox" hidden></ul></div>
       <p id="pMsg" class="hint" aria-live="polite"></p>
       <div class="row3"><label>Latitude (+N)<input id="pLat" type="number" step="0.0001" min="-90" max="90" value="${esc(p.lat)}" required></label><label>Longitude (+E)<input id="pLon" type="number" step="0.0001" min="-180" max="180" value="${esc(p.lon)}" required></label><label>Time zone<input id="pTz" list="tzs" value="${esc(p.tz)}" required></label></div>
       <p class="hint">Pick a suggestion to fill the coordinates. If your city is not listed, type its latitude, longitude and time zone directly. If the birth time is unknown, 12:00 is used; the Moon sign is usually right but the nakshatra may be off. Details stay in your browser.</p>
@@ -102,7 +102,7 @@
     const f = $('pForm');
     if (f) {
       const pl = $('pPlace');
-      if (window.PlacePicker) window.PlacePicker.attach({ input: pl, list: $('pList'), msg: $('pMsg'), onPick: m => { $('pLat').value = m.lat; $('pLon').value = m.lon; $('pTz').value = m.tz; } });
+      if (window.PlacePicker) window.PlacePicker.attach({ input: pl, list: $('pPlaceList'), msg: $('pMsg'), onPick: m => { $('pLat').value = m.lat; $('pLon').value = m.lon; $('pTz').value = m.tz; } });
       f.addEventListener('submit', e => {
         e.preventDefault(); const err = $('pErr'); err.hidden = true;
         const p = st.partner; p.name = $('pName').value.trim(); p.role = $('pRole').value; p.date = $('pDate').value; p.time = $('pTime').value || '12:00'; p.place = pl.value; p.lat = $('pLat').value; p.lon = $('pLon').value; p.tz = $('pTz').value.trim();
