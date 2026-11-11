@@ -49,7 +49,7 @@ if (!okRD) fail++;
 
 // ---- reports modules
 {
-  const K = require('./lib/koota.js'), N = require('./lib/numerology.js'), R = require('./lib/reports.js'), Pr = require('./public/predict.js');
+  const K = require('./public/koota.js'), N = require('./public/numerology.js'), R = require('./public/reports.js'), Pr = require('./public/predict.js');
   const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) process.exitCode = 1; };
   const a = E.computeChart({ year: 1999, month: 5, day: 21, hour: 17, minute: 25, lat: 28.61, lon: 77.2, tz: 'Asia/Kolkata' });
   const m = K.match(a, a);

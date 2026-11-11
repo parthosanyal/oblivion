@@ -22,7 +22,3 @@
 ## Quick check
 - Visit https://securityheaders.com and https://www.ssllabs.com/ssltest/ with your public URL.
 
-## Payments
-- `/api/*` accepts POST only, JSON up to 16 KB, same-origin only, with per-IP rate limits; request bodies are never logged.
-- Full reports are generated only when a valid HMAC-signed access token (report + birth-chart fingerprint + expiry) is supplied; payment signatures are verified server-side with HMAC-SHA256.
-- Razorpay keys live only in environment variables.
