@@ -5,7 +5,7 @@ const b64 = f => 'data:image/png;base64,' + fs.readFileSync(path.join(__dirname,
 html = html.replace('src="icon-logo.png"', () => 'src="' + b64('icon-logo.png') + '"');
 html = html.replace(/<link rel="stylesheet" href="style.css">/, () => '<style>' + R('style.css') + '</style>');
 const L = R;
-for (const f of ['engine.js', 'predict.js', 'bala.js', 'reading.js', 'cities.js', 'geo.js', 'place.js', 'app.js', 'nav.js']) html = html.replace(`<script src="${f}"></script>`, () => '<script>' + R(f) + '</script>');
+for (const f of ['engine.js', 'predict.js', 'bala.js', 'reading.js', 'kp.js', 'cities.js', 'geo.js', 'place.js', 'app.js', 'kp-ui.js', 'nav.js']) html = html.replace(`<script src="${f}"></script>`, () => '<script>' + R(f) + '</script>');
 // report engines live in lib/ (server side); the offline demo inlines them so reports work without a server (free, no payments)
 html = html.replace('<script src="sections.js"></script>', () => ['texts.js', 'koota.js', 'numerology.js', 'reports.js', 'service.js'].map(f => '<script>' + L(f) + '</script>').join('\n') + '\n<script>' + R('sections.js') + '</script>');
 fs.mkdirSync(path.join(__dirname, 'dist'), { recursive: true });

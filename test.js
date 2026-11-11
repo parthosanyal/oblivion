@@ -69,4 +69,24 @@ if (!okRD) fail++;
   ok(Math.abs(((sunN - sunV + 540) % 360) - 180) < 0.01, 'varsha: Sun returns to natal longitude');
 }
 
+
+// ---- KP ----
+{
+  const KP = require('./public/kp.js'), chart = E.computeChart({ year: 1999, month: 5, day: 21, hour: 17, minute: 25, lat: 28.6139, lon: 77.209, tz: 'Asia/Kolkata' });
+  const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fail++; };
+  const t = KP.horaryTable(); ok(t.length === 249 && Math.abs(t[248].to - 360) < 1e-9 && t.every((r, i) => i === 0 || Math.abs(r.from - t[i - 1].to) < 1e-9), 'kp: 249 contiguous horary rows');
+  const l0 = KP.lords(0.5); ok(l0.star === 'Ketu' && l0.sub === 'Ketu', 'kp: 0°30\' Aries is Ketu/Ketu');
+  ok(KP.lords(0.8).sub === 'Venus', 'kp: 0°48\' Aries sub lord is Venus');
+  const k = KP.compute(chart);
+  ok(k.cusps.length === 12 && k.cusps.every((c, i) => i === 0 || ((c.lon - k.cusps[i - 1].lon + 360) % 360) > 5 && ((c.lon - k.cusps[i - 1].lon + 360) % 360) < 60), 'kp: 12 Placidus cusps in order');
+  ok(Math.abs(((k.cusps[6].lon - k.cusps[0].lon + 360) % 360) - 180) < 1e-6 && Math.abs(((k.cusps[9].lon - k.cusps[3].lon + 360) % 360) - 180) < 1e-6 && Math.abs(((k.cusps[10].lon - k.cusps[4].lon + 360) % 360) - 180) < 1e-6, 'kp: opposite cusps 180° apart');
+  ok(k.planets.every(p => p.house >= 1 && p.house <= 12 && p.sub && p.subsub), 'kp: every planet has house and lords');
+  ok(Math.abs(k.cusps[0].lon - ((chart.lagna.lon + KP.SHIFT) % 360)) < 1e-6, 'kp: cusp 1 equals Lagna with KP ayanamsa');
+  // Placidus property: cusp 11 sits 1/3 of its semi-arc east of the meridian
+  { const ayan = chart.ayanamsa, lam = (k.cusps[10].lon - KP.SHIFT + ayan) % 360, eps = chart.eps, R = Math.PI / 180, dec = Math.asin(Math.sin(eps * R) * Math.sin(lam * R)), ra = (Math.atan2(Math.sin(lam * R) * Math.cos(eps * R), Math.cos(lam * R)) / R + 360) % 360, dsa = Math.acos(-Math.tan(28.6139 * R) * Math.tan(dec)) / R;
+    ok(Math.abs(((ra - chart.ramc + 540) % 360) - 180 - dsa / 3) < 1e-4 || Math.abs((ra - chart.ramc + 360) % 360 - dsa / 3) < 1e-4, 'kp: cusp 11 is one third of its semi-arc from the MC'); }
+  ok(k.analysis.length === 11 && k.periods[0].antars.length === 9 && KP.ruling(chart, 3).list.length === 5, 'kp: analysis, periods and ruling planets built');
+  ok(E.CLASSICAL_VARGAS.length === 16, 'vargas: 16 classical charts');
+}
+console.log(fail ? fail + ' FAILED' : 'all tests passed'); 
 process.exit(fail ? 1 : 0);

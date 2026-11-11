@@ -177,3 +177,7 @@ details.pt .ptt{flex:1;min-width:0}
 
 footer .contact{margin-top:10px}footer .contact a{white-space:nowrap}
 .repload{padding:30px;text-align:center;color:var(--mute)}
+.kpgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin:12px 0}
+.kpcard{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--card)}
+.kpcard.good{border-left:5px solid #2e9e6b}.kpcard.mid{border-left:5px solid #d9a62b}.kpcard.low{border-left:5px solid #b4545c}
+.kpcard .tag{margin-left:8px}

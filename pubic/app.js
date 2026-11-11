@@ -66,7 +66,7 @@
   function fillVargaSelects() {
     [['vSel1', 1], ['vSel2', 9]].forEach(([id, def]) => {
       const s = $(id); if (s.options.length) return;
-      for (let n = 1; n <= 60; n++) { const o = document.createElement('option'); o.value = n; const nm = E.VARGA_NAMES[n]; o.textContent = `D${n}${nm ? ' · ' + nm : ''}${E.CLASSICAL_VARGAS.includes(n) ? '' : ' (non-classical)'}`; s.appendChild(o); }
+      E.CLASSICAL_VARGAS.forEach(n => { const o = document.createElement('option'); o.value = n; const nm = E.VARGA_NAMES[n]; o.textContent = `D${n}${nm ? ' · ' + nm : ''}`; s.appendChild(o); });
       s.value = def; s.addEventListener('change', drawCharts);
     });
   }
@@ -89,11 +89,11 @@
   function planetLabels(list, useNav) {
     return list.map(p => `${ABBR[p.key]}${p.retro && p.key !== 'Rahu' && p.key !== 'Ketu' ? '℞' : ''}`);
   }
-  function northSvg(lagnaSign, bodies) { // bodies: [{sign, label}]
+  function northSvg(lagnaSign, bodies, opts) { // bodies: [{sign, label}]; opts {signs:[12], } places bodies by house index (KP bhava chart)
     let s = `<svg class="chart" viewBox="-4 -4 408 408" role="img" aria-label="North Indian chart"><rect x="0" y="0" width="400" height="400" fill="var(--chart)" stroke="var(--gold)" stroke-width="2"/>`;
     NORTH.forEach((h, i) => {
-      const sign = (lagnaSign + i) % 12;
-      const here = bodies.filter(b => b.sign === sign).map(b => b.label);
+      const sign = opts && opts.signs ? opts.signs[i] : (lagnaSign + i) % 12;
+      const here = bodies.filter(b => opts && opts.signs ? b.house === i : b.sign === sign).map(b => b.label);
       s += `<polygon points="${h.p}" fill="${i === 0 ? 'color-mix(in srgb,var(--gold) 14%,transparent)' : 'none'}" stroke="var(--gold)" stroke-width="1.5"/>`;
       s += `<text x="${h.s[0]}" y="${h.s[1]}" text-anchor="middle" font-size="13" fill="var(--mute)">${sign + 1}</text>`;
       const lng = bodies.some(b => b.label.length > 4), per = [0,3,6,9].includes(i) ? (lng ? 2 : 3) : 2, fs = lng ? (here.length > 4 ? 10 : 11.5) : (here.length > 4 ? 12 : 14), lh = fs + 3;
@@ -160,13 +160,13 @@
   function drawGallery() {
     const f = svgByStyle(document.querySelector('input[name=style]:checked').value);
     let html = '';
-    for (let n = 1; n <= 60; n++) { const v = vargaInfo(n); html += `<figure class="gcard" data-n="${n}" tabindex="0"><b>${v.title}</b><small>${v.note}</small>${svgFor(n, f)}</figure>`; }
+    for (const n of E.CLASSICAL_VARGAS) { const v = vargaInfo(n); html += `<figure class="gcard" data-n="${n}" tabindex="0"><b>${v.title}</b><small>${v.note}</small>${svgFor(n, f)}</figure>`; }
     $('vargas').innerHTML = html;
   }
   function zoom(n) {
     const f = svgByStyle(document.querySelector('input[name=style]:checked').value), v = vargaInfo(n);
     $('zoomTitle').textContent = v.title; $('zoomBody').innerHTML = svgFor(n, f);
-    $('zoomNote').textContent = (E.VARGA_USE[n] ? `Signifies: ${E.VARGA_USE[n]}.` : 'Non-classical division: equal parts counted from the sign itself; conventions vary.');
+    $('zoomNote').textContent = `Signifies: ${E.VARGA_USE[n]}.`;
     $('zoom').showModal();
   }
   $('vargas').addEventListener('click', e => { const g = e.target.closest('.gcard'); if (g) zoom(+g.dataset.n); });

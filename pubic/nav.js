@@ -7,6 +7,7 @@
     ['🪐', 'Birth Chart', [['Charts', 'tab:chart'], ['Planets', 'tab:planets'], ['D1–D60 Charts', 'tab:vargas'], ['Panchang & Yogas', 'tab:panchang']]],
     ['⏳', 'Predictions', [['Life Predictions', 'tab:predict'], ['Dasha', 'tab:dasha'], ['Transits', 'tab:gochar']]],
     ['💪', 'Strength', [['Shadbala', 'tab:shadbala'], ['Ashtakavarga', 'tab:av'], ['Readings', 'tab:read']]],
+    ['🧭', 'KP Astrology', [['Planets & cusps', 'kp:chart'], ['Significators', 'kp:sig'], ['Cuspal sub-lords', 'kp:csl'], ['Dasha & timing', 'kp:dasha'], ['Ruling planets', 'kp:rp'], ['Horary 1–249', 'kp:horary']]],
     ['📋', 'Reports', [['Kundli analysis', 'sec:kundli'], ['Marriage', 'sec:marriage'], ['Career & finance', 'sec:career'], ['Numerology', 'sec:numerology'], ['Yearly horoscope', 'sec:yearly']]]
   ];
   const r1 = document.createElement('div'), r2 = document.createElement('div'); r1.className = 'sea1'; r2.className = 'sea2'; r1.setAttribute('role', 'tablist'); r1.setAttribute('aria-label', 'Sections'); r2.setAttribute('role', 'tablist'); r2.setAttribute('aria-label', 'Pages');
@@ -15,6 +16,7 @@
   const go = v => {
     const [k, id] = v.split(':');
     if (k === 'tab') { const b = tabs.querySelector('[data-tab=' + id + ']'); if (b) b.click(); }
+    else if (k === 'kp') { const b = tabs.querySelector('[data-tab=kp]'); if (b) b.click(); const q = document.querySelector('#kpSwitch [data-sec=' + id + ']'); if (q) q.click(); }
     else { const b = tabs.querySelector('[data-tab=reports]'); if (b) b.click(); const q = document.querySelector('#repSwitch [data-sec=' + id + ']'); if (q) q.click(); }
   };
   const draw = () => {
