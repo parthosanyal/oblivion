@@ -170,10 +170,10 @@ details.pt .ptt{flex:1;min-width:0}
 
 /* partner place picker + paywall */
 .combo{position:relative}
-#pList{position:absolute;z-index:20;left:0;right:0;top:64px;margin:0;padding:4px;list-style:none;background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.18);max-height:280px;overflow:auto}
-#pList li{padding:8px 10px;border-radius:7px;cursor:pointer;font-size:14px;display:flex;justify-content:space-between;gap:10px}
-#pList li small{color:var(--mute);white-space:nowrap}
-#pList li[aria-selected="true"],#pList li:hover{background:color-mix(in srgb,var(--accent2) 16%,transparent)}
+#pPlaceList{position:absolute;z-index:20;left:0;right:0;top:64px;margin:0;padding:4px;list-style:none;background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.18);max-height:280px;overflow:auto}
+#pPlaceList li{padding:8px 10px;border-radius:7px;cursor:pointer;font-size:14px;display:flex;justify-content:space-between;gap:10px}
+#pPlaceList li small{color:var(--mute);white-space:nowrap}
+#pPlaceList li[aria-selected="true"],#pPlaceList li:hover{background:color-mix(in srgb,var(--accent2) 16%,transparent)}
 
 footer .contact{margin-top:10px}footer .contact a{white-space:nowrap}
 .repload{padding:30px;text-align:center;color:var(--mute)}
