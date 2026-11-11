@@ -52,3 +52,19 @@ Kundli analysis, Marriage compatibility (Ashtakoota 36 points + Manglik + timing
 
 ## Icon
 `public/icon-*.png`, `apple-touch-icon.png` and `manifest.webmanifest` come from your supplied icon (favicon, phone home-screen icon, header logo, share image). The single-file build embeds the header logo.
+
+## Paid reports (Razorpay)
+
+Reports are built on the server (`lib/`). Point 1 of each report is a free preview; the rest need a one-time payment per report and per birth chart.
+
+Set these environment variables on Render (never commit them):
+
+| Variable | Meaning |
+|---|---|
+| `RAZORPAY_KEY_ID` | Razorpay Key ID (use `rzp_test_...` first, then `rzp_live_...`) |
+| `RAZORPAY_KEY_SECRET` | Razorpay Key Secret |
+| `TOKEN_SECRET` | optional long random string that signs access tokens |
+| `PRICE_KUNDLI`, `PRICE_MARRIAGE`, `PRICE_CAREER`, `PRICE_NUMEROLOGY`, `PRICE_YEARLY` | prices in rupees (defaults 99, 199, 149, 49, 99) |
+| `TOKEN_DAYS` | access length in days (default 365) |
+
+Without the two Razorpay keys the site runs with all reports free. Enable auto-capture in the Razorpay dashboard. Run `npm test` (includes a mock-Razorpay API test).
