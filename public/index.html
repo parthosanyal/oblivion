@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Jyotish Kundli – Free Vedic Birth Chart, Dasha, Shadbala &amp; Ashtakavarga</title>
-<meta name="description" content="Free Vedic astrology Kundli generator: Lahiri birth chart, Navamsa and D1–D60 divisional charts, Vimshottari and Yogini Dasha, Shadbala, Ashtakavarga, yogas, Panchang, transits and Sade Sati. Free Kundli in your browser; detailed reports are paid.">
+<meta name="description" content="Free Vedic astrology Kundli generator: Lahiri birth chart, Navamsa and D1–D60 divisional charts, Vimshottari and Yogini Dasha, Shadbala, Ashtakavarga, yogas, Panchang, transits and Sade Sati. Runs in your browser; your birth details stay private.">
 <meta name="keywords" content="Jyotish Kundli, Vedic astrology, free kundli, birth chart, janam kundli, Lahiri ayanamsa, Vimshottari dasha, Yogini dasha, Shadbala, Ashtakavarga, divisional charts, D9 Navamsa, Sade Sati, Panchang">
 <meta name="author" content="Jyotish Kundli">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
@@ -26,7 +26,7 @@
 <meta name="twitter:image" content="https://oblivion-ukmg.onrender.com/icon-512.png">
 <meta name="twitter:title" content="Jyotish Kundli – Free Vedic Birth Chart">
 <meta name="twitter:description" content="Vedic Kundli with Dasha, Shadbala, Ashtakavarga and transits.">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Jyotish Kundli","url":"https://oblivion-ukmg.onrender.com/","applicationCategory":"LifestyleApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"INR","description":"Free Kundli; detailed reports are paid"},"description":"Free Vedic astrology Kundli generator with divisional charts, Vimshottari and Yogini Dasha, Shadbala, Ashtakavarga and transits.","inLanguage":"en"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Jyotish Kundli","url":"https://oblivion-ukmg.onrender.com/","applicationCategory":"LifestyleApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"INR"},"description":"Free Vedic astrology Kundli generator with divisional charts, Vimshottari and Yogini Dasha, Shadbala, Ashtakavarga and transits.","inLanguage":"en"}</script>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -80,6 +80,7 @@
         <span>Style:</span>
         <label class="seg"><input type="radio" name="style" value="north" checked><span>North Indian</span></label>
         <label class="seg"><input type="radio" name="style" value="south"><span>South Indian</span></label>
+        <label class="seg"><input type="radio" name="style" value="east"><span>East Indian</span></label>
         <button id="print" type="button" class="ghost">Print / Save PDF</button>
       </div>
 
@@ -88,7 +89,7 @@
         <figure class="card"><figcaption><select id="vSel1" class="vsel"></select></figcaption><div id="d1"></div><p class="hint" id="vNote1"></p></figure>
         <figure class="card"><figcaption><select id="vSel2" class="vsel"></select></figcaption><div id="d9"></div><p class="hint" id="vNote2"></p></figure>
       </div>
-      <p class="hint">Whole-sign houses. In the North Indian style houses are fixed (top = 1st house) and the small number is the sign; in the South Indian style signs are fixed and “Asc” marks the Lagna.</p>
+      <p class="hint">Whole-sign houses. In the North Indian style houses are fixed (top = 1st house) and the small number is the sign; in the South Indian style signs are fixed and “Asc” marks the Lagna; in the East Indian (Bengal/Odisha) style signs are also fixed, with Aries in the top-centre cell and the other signs running anticlockwise, and “Asc” marks the Lagna.</p>
     </div>
     <div class="tab" id="tab-reports" hidden>
       <div class="rsw" id="repSwitch" role="tablist" aria-label="Report type"></div>
@@ -143,23 +144,28 @@
     <h2>About Jyotish Kundli</h2>
     <p>Jyotish Kundli is a free Vedic astrology (Jyotish) birth chart generator. Enter your date, time and place of birth to get your Lagna, Rashi, Nakshatra and planetary positions using the Lahiri ayanamsa and whole-sign houses.</p>
     <ul>
-      <li>Lagna and Navamsa charts, plus every divisional chart from D1 to D60, in North and South Indian styles</li>
+      <li>Lagna and Navamsa charts, plus every divisional chart from D1 to D60, in North, South and East Indian styles</li>
       <li>Vimshottari and Yogini Dasha with Antardasha dates and a lifetime outlook timeline</li>
       <li>Shadbala planetary strength with percentages, and Sarvashtakavarga and Bhinnashtakavarga charts</li>
       <li>Reports: Kundli analysis, marriage compatibility (Ashtakoota), career and finance, numerology and a yearly horoscope with a Varsha chart</li>
       <li>Panchang, yogas and doshas (Manglik, Kaal Sarp, Gajakesari and more), current transits and Sade Sati</li>
     </ul>
     <p class="hint">Marriage matching uses the Ashtakoota tables as published by common sources: Varna by Moon sign; Vashya and Gana read bride-by-groom; Tara by nakshatra count; Yoni simplified to same animal 4, sworn enemies 0, others 2; Graha Maitri by natural friendship; Bhakoot 2/12, 5/9 and 6/8 score 0; Nadi same scores 0. Sources differ slightly on Vashya, Gana direction and Yoni, so scores can differ from other calculators.</p>
-    <p class="hint">Your chart, dashas, strengths and transits are calculated in your browser and your birth details are not sent anywhere for them. Only when you open a Report (Reports tab) are the birth details sent over HTTPS to this site's server to build it; they are processed in memory and not stored. A place name you type is looked up to find coordinates. Results are for learning and reflection, not professional advice.</p>
+    <p class="hint">All calculations run in your browser. Your birth date and time are not sent to any server; only a place name you type is looked up to find coordinates. Results are for learning and reflection, not professional advice.</p>
   </section>
 </main>
 <dialog id="zoom"><button id="zoomClose" class="ghost" type="button">Close ✕</button><h3 id="zoomTitle"></h3><div id="zoomBody"></div><p class="hint" id="zoomNote"></p></dialog>
-<footer>Charts are calculated in your browser. For the Reports tab only, birth details are sent securely to the server to build the report, processed in memory and not stored. When you search for a place, only the place name you type is sent to Open-Meteo's free geocoding service. Planetary positions are accurate to a fraction of a degree — verify against a professional ephemeris before relying on them. For reflection and entertainment, not professional advice. Offline place data: <a href="https://github.com/dr5hn/countries-states-cities-database" rel="noopener" target="_blank">countries-states-cities-database</a> (ODbL 1.0).
-<div class="contact"><b>Contact:</b> <a href="tel:+918637895349">+91 86378 95349</a> · <a href="mailto:ppsendorsed2105@gmail.com">ppsendorsed2105@gmail.com</a> · <a href="terms.html">Terms</a> · <a href="privacy.html">Privacy</a> · <a href="refund.html">Refund policy</a> · <a href="contact.html">Contact</a></div></footer>
+<footer>Charts and reports are calculated in your browser; your birth date and time never leave it. When you search for a place, only the place name you type is sent to Open-Meteo's free geocoding service. Planetary positions are accurate to a fraction of a degree — verify against a professional ephemeris before relying on them. For reflection and entertainment, not professional advice. Offline place data: <a href="https://github.com/dr5hn/countries-states-cities-database" rel="noopener" target="_blank">countries-states-cities-database</a> (ODbL 1.0).
+<div class="contact"><b>Contact:</b> <a href="tel:+918637895349">+91 86378 95349</a> · <a href="mailto:ppsendorsed2105@gmail.com">ppsendorsed2105@gmail.com</a> · <a href="terms.html">Terms</a> · <a href="privacy.html">Privacy</a> · <a href="contact.html">Contact</a></div></footer>
 <script src="engine.js"></script>
 <script src="predict.js"></script>
 <script src="bala.js"></script>
 <script src="reading.js"></script>
+<script src="texts.js"></script>
+<script src="koota.js"></script>
+<script src="numerology.js"></script>
+<script src="reports.js"></script>
+<script src="service.js"></script>
 <script src="cities.js"></script>
 <script src="geo.js"></script>
 <script src="place.js"></script>

@@ -117,6 +117,39 @@
     }
     return s + '</svg>';
   }
+  // East Indian (Bengal/Odisha): signs are fixed, Aries top-centre, signs run anticlockwise; corner cells are split diagonally
+  const EU = 400 / 3, EP = (c, r) => [c * EU, r * EU];
+  const EAST = (() => {
+    const R = (c, r) => ({ rect: [c * EU, r * EU, EU, EU] }), T = (ra, a, b) => ({ tri: [ra, a, b] }), P = EP, m = {};
+    m[0] = R(1, 0);
+    m[1] = T(P(1, 0), P(0, 0), P(1, 1)); m[2] = T(P(0, 1), P(0, 0), P(1, 1));
+    m[3] = R(0, 1);
+    m[4] = T(P(0, 2), P(1, 2), P(0, 3)); m[5] = T(P(1, 3), P(1, 2), P(0, 3));
+    m[6] = R(1, 2);
+    m[7] = T(P(2, 3), P(2, 2), P(3, 3)); m[8] = T(P(3, 2), P(2, 2), P(3, 3));
+    m[9] = R(2, 1);
+    m[10] = T(P(3, 1), P(3, 0), P(2, 1)); m[11] = T(P(2, 0), P(3, 0), P(2, 1));
+    return m;
+  })();
+  function eastSvg(lagnaSign, bodies) {
+    let s = `<svg class="chart" viewBox="-4 -4 408 408" role="img" aria-label="East Indian chart"><rect x="0" y="0" width="400" height="400" fill="var(--chart)" stroke="var(--gold)" stroke-width="2"/>`;
+    for (let sign = 0; sign < 12; sign++) {
+      const sh = EAST[sign], fill = sign === lagnaSign ? 'color-mix(in srgb,var(--gold) 14%,transparent)' : 'none', here = bodies.filter(b => b.sign === sign).map(b => b.label);
+      const lng = bodies.some(b => b.label.length > 4), fs = lng ? (here.length > 4 ? 10 : 11.5) : (here.length > 4 ? 12 : 14), lh = fs + 3, name = E.SIGNS[sign].slice(0, 3) + (sign === lagnaSign ? ' · Asc' : '');
+      let lx, ly, px, py, per;
+      if (sh.rect) { const [x, y, w, h] = sh.rect; s += `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}" stroke="var(--gold)" stroke-width="1.5"/>`; lx = x + w / 2; ly = y + 14; px = x + w / 2; py = y + h / 2 + 6; per = lng ? 2 : 3; }
+      else {
+        const [ra, a, b] = sh.tri, M = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], at = k => [ra[0] + k * (M[0] - ra[0]), ra[1] + k * (M[1] - ra[1])];
+        s += `<polygon points="${ra} ${a} ${b}" fill="${fill}" stroke="var(--gold)" stroke-width="1.5"/>`;
+        [lx, ly] = at(0.3); [px, py] = at(0.66); per = 2;
+      }
+      s += `<text x="${lx.toFixed(1)}" y="${(ly + 4).toFixed(1)}" text-anchor="middle" font-size="10.5" fill="var(--mute)">${name}</text>`;
+      const rows = []; for (let k = 0; k < here.length; k += per) rows.push(here.slice(k, k + per).join(' '));
+      rows.forEach((r, k) => s += `<text x="${px.toFixed(1)}" y="${(py + (k - (rows.length - 1) / 2) * lh + 4).toFixed(1)}" text-anchor="middle" font-size="${fs}" font-weight="600" fill="var(--accent2)">${esc(r)}</text>`);
+    }
+    return s + `<text x="200" y="196" text-anchor="middle" font-size="12" fill="var(--mute)">East Indian</text><text x="200" y="214" text-anchor="middle" font-size="10" fill="var(--mute)">signs run anticlockwise</text></svg>`;
+  }
+  const svgByStyle = st => st === 'north' ? northSvg : st === 'east' ? eastSvg : southSvg;
   function vargaInfo(n) {
     const nm = E.VARGA_NAMES[n];
     return { title: `D${n}${nm ? ' · ' + nm : ''}`, note: E.VARGA_USE[n] ? E.VARGA_USE[n] : 'Non-classical (equal division)' };
@@ -125,13 +158,13 @@
     return f(E.vargaSign(chart.lagna.lon, n), chart.planets.map(p => ({ sign: E.vargaSign(p.lon, n), label: ABBR[p.key] + (n === 1 && p.retro && !['Rahu','Ketu'].includes(p.key) ? '℞' : '') })));
   }
   function drawGallery() {
-    const f = document.querySelector('input[name=style]:checked').value === 'north' ? northSvg : southSvg;
+    const f = svgByStyle(document.querySelector('input[name=style]:checked').value);
     let html = '';
     for (let n = 1; n <= 60; n++) { const v = vargaInfo(n); html += `<figure class="gcard" data-n="${n}" tabindex="0"><b>${v.title}</b><small>${v.note}</small>${svgFor(n, f)}</figure>`; }
     $('vargas').innerHTML = html;
   }
   function zoom(n) {
-    const f = document.querySelector('input[name=style]:checked').value === 'north' ? northSvg : southSvg, v = vargaInfo(n);
+    const f = svgByStyle(document.querySelector('input[name=style]:checked').value), v = vargaInfo(n);
     $('zoomTitle').textContent = v.title; $('zoomBody').innerHTML = svgFor(n, f);
     $('zoomNote').textContent = (E.VARGA_USE[n] ? `Signifies: ${E.VARGA_USE[n]}.` : 'Non-classical division: equal parts counted from the sign itself; conventions vary.');
     $('zoom').showModal();
@@ -143,7 +176,7 @@
     if (!chart) return;
     drawGallery();
     if (typeof drawAV === 'function' && AV) { drawAV(); renderGochar(curGDate()); }
-    const style = document.querySelector('input[name=style]:checked').value, f = style === 'north' ? northSvg : southSvg;
+    const style = document.querySelector('input[name=style]:checked').value, f = svgByStyle(style);
     [['vSel1','d1','vNote1'],['vSel2','d9','vNote2']].forEach(([sel, box, note]) => {
       const n = +$(sel).value;
       const bodies = chart.planets.map(p => ({ sign: E.vargaSign(p.lon, n), label: ABBR[p.key] + (n === 1 && p.retro && !['Rahu','Ketu'].includes(p.key) ? '℞' : '') }));
@@ -270,7 +303,7 @@
 
   function drawAV() {
     if (!AV) return;
-    const style = document.querySelector('input[name=style]:checked').value, f = style === 'north' ? northSvg : southSvg;
+    const style = document.querySelector('input[name=style]:checked').value, f = svgByStyle(style);
     const sav = avPick === 'SAV', arr = sav ? AV.sav : AV.bav[avPick].signs, max = sav ? 56 : 8, avg = sav ? 28 : null;
     $('avTitle').textContent = sav ? `Sarvashtakavarga (total ${AV.savTotal})` : `${avPick} Bhinnashtakavarga (total ${AV.bav[avPick].total})`;
     $('avChart').innerHTML = f(chart.lagna.sign, arr.map((v, s) => ({ sign: s, label: String(v) })));
@@ -280,7 +313,7 @@
   }
 
   function renderGochar(ms) {
-    const g = E.computeGochar(chart, ms), style = document.querySelector('input[name=style]:checked').value, f = style === 'north' ? northSvg : southSvg, showDeg = $('gDeg').checked;
+    const g = E.computeGochar(chart, ms), style = document.querySelector('input[name=style]:checked').value, f = svgByStyle(style), showDeg = $('gDeg').checked;
     $('gSade').innerHTML = `<b>Saturn status on ${new Date(ms).toLocaleDateString()}:</b> ${g.sadeSati}`;
     const rx = p => p.retro && !['Rahu','Ketu'].includes(p.key) ? '℞' : '';
     $('gChart').innerHTML = f(chart.lagna.sign, g.planets.map(p => ({ sign: p.sign, label: ABBR[p.key] + rx(p) + (showDeg ? ' ' + Math.floor(p.deg) + '°' : '') })));
@@ -339,7 +372,7 @@
     const t = new Date(); $('gDate').value = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`;
     renderGochar(now);
     // hook for the Reports tab (sections.js)
-    window.JK = { chart: c, pred, northSvg, southSvg, ABBR, fmtDeg, esc };
+    window.JK = { chart: c, pred, northSvg, southSvg, eastSvg, svgByStyle, ABBR, fmtDeg, esc };
     document.dispatchEvent(new CustomEvent('kundli:ready'));
   }
 })();

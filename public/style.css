@@ -174,13 +174,6 @@ details.pt .ptt{flex:1;min-width:0}
 #pList li{padding:8px 10px;border-radius:7px;cursor:pointer;font-size:14px;display:flex;justify-content:space-between;gap:10px}
 #pList li small{color:var(--mute);white-space:nowrap}
 #pList li[aria-selected="true"],#pList li:hover{background:color-mix(in srgb,var(--accent2) 16%,transparent)}
-.paywall{border:2px solid #0e7490}
-.paywall .price{font-size:26px;font-weight:700;margin:4px 0}
-.paywall .small{font-size:12.5px;color:var(--mute);margin:8px 0 0}
-.paywall .linkbtn{background:none;border:0;padding:0;color:#0e7490;text-decoration:underline;cursor:pointer;font:inherit}
-.pt.locked{display:flex;align-items:center;gap:10px;padding:12px 14px;margin:8px 0;border:1px dashed var(--line);border-radius:10px;opacity:.75}
-.pt.locked .lk{margin-left:auto}
-.pnav button.lockd{opacity:.6}
-.repload{padding:30px;text-align:center;color:var(--mute)}
+
 footer .contact{margin-top:10px}footer .contact a{white-space:nowrap}
-.pt.locked .pn{flex:none;width:26px;height:26px;border-radius:50%;background:var(--mute);color:#fff;display:grid;place-items:center;font-size:13px}
+.repload{padding:30px;text-align:center;color:var(--mute)}

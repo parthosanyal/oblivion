@@ -3,7 +3,7 @@
  * (Vashya, Gana direction, Yoni), and the UI says so. Pure functions, no DOM.
  */
 (function (root, factory) {
-  if (typeof module === 'object' && module.exports) module.exports = factory(require('./engine.js'));
+  if (typeof module === 'object' && module.exports) module.exports = factory(require('../public/engine.js'));
   else root.Koota = factory(root.VedicEngine);
 })(typeof self !== 'undefined' ? self : this, function (E) {
   const SIGNS = E.SIGNS, LORD = E.SIGN_LORDS;
