@@ -3,6 +3,7 @@
  */
 (function () {
   const tabs = document.getElementById('tabs'); if (!tabs) return;
+  const DESC = {'Birth Chart':'Rashi, Navamsa and all charts','Predictions':'Life events, Dasha and transits','Strength':'Shadbala, Ashtakavarga, readings','KP Astrology':'Cusps, significators, horary','Reports':'Marriage, career, numerology'};
   const GROUPS = [
     ['🪐', 'Birth Chart', [['Charts', 'tab:chart'], ['Planets', 'tab:planets'], ['D1–D60 Charts', 'tab:vargas'], ['Panchang & Yogas', 'tab:panchang']]],
     ['⏳', 'Predictions', [['Life Predictions', 'tab:predict'], ['Dasha', 'tab:dasha'], ['Transits', 'tab:gochar']]],
@@ -20,7 +21,7 @@
     else { const b = tabs.querySelector('[data-tab=reports]'); if (b) b.click(); const q = document.querySelector('#repSwitch [data-sec=' + id + ']'); if (q) q.click(); }
   };
   const draw = () => {
-    r1.innerHTML = GROUPS.map((x, i) => `<button type="button" role="tab" aria-selected="${i === g}" class="${i === g ? 'on' : ''}" data-g="${i}"><span aria-hidden="true">${x[0]}</span> ${x[1]}</button>`).join('');
+    r1.innerHTML = GROUPS.map((x, i) => `<button type="button" role="tab" aria-selected="${i === g}" class="${i === g ? 'on' : ''}" data-g="${i}"><span class="ti" aria-hidden="true">${x[0]}</span><b>${x[1]}</b><small>${DESC[x[1]]}</small></button>`).join('');
     r2.innerHTML = GROUPS[g][2].map((x, i) => `<button type="button" role="tab" aria-selected="${i === s}" class="${i === s ? 'on' : ''}" data-s="${i}">${x[0]}</button>`).join('');
   };
   r1.addEventListener('click', e => { const b = e.target.closest('[data-g]'); if (!b) return; g = +b.dataset.g; s = 0; draw(); go(GROUPS[g][2][0][1]); });

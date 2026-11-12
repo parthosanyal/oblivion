@@ -1,6 +1,6 @@
 /* Place search: instant offline matches (built-in list + full offline city dataset) + live worldwide lookup (Open-Meteo geocoding; only the typed place name is sent). */
 (function () {
-  const norm = s => String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim();
+  const norm = s => String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^\p{L}\p{M}\p{N} ]+/gu, ' ').replace(/\s+/g, ' ').trim();
   const offline = () => (window.CITIES || []).map(c => ({ label: c[0], lat: c[1], lon: c[2], tz: c[3], src: 'built-in', key: norm(c[0]) }));
   let cache = null;
 
@@ -48,7 +48,7 @@
   }
   async function searchOnline(q, signal) {
     const n = norm(q); if (n.length < 2) return [];
-    const url = 'https://geocoding-api.open-meteo.com/v1/search?count=10&language=en&format=json&name=' + encodeURIComponent(q.trim());
+    const url = 'https://geocoding-api.open-meteo.com/v1/search?count=10&language=' + ({ hi: 'hi', bn: 'bn', or: 'or' }[(window.I18N && window.I18N.lang()) || ''] || 'en') + '&format=json&name=' + encodeURIComponent(q.trim());
     const r = await fetch(url, { signal });
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const j = await r.json();
