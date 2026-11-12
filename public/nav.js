@@ -26,4 +26,5 @@
   r1.addEventListener('click', e => { const b = e.target.closest('[data-g]'); if (!b) return; g = +b.dataset.g; s = 0; draw(); go(GROUPS[g][2][0][1]); });
   r2.addEventListener('click', e => { const b = e.target.closest('[data-s]'); if (!b) return; s = +b.dataset.s; draw(); go(GROUPS[g][2][s][1]); });
   draw();
+  window.JKNav = { open(v) { for (let i = 0; i < GROUPS.length; i++) { const j = GROUPS[i][2].findIndex(x => x[1] === v); if (j >= 0) { g = i; s = j; draw(); go(v); return true; } } return false; } };
 })();
