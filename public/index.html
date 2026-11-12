@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AstroSarangi – Free Vedic Kundli, Dasha, KP &amp; Divisional Charts</title>
+<meta name="description" content="Free Vedic astrology Kundli generator: Lahiri birth chart, Navamsa and the 16 classical divisional charts (D1–D60), Vimshottari and Yogini Dasha, Shadbala, Ashtakavarga, yogas, Panchang, transits and Sade Sati. Runs in your browser; your birth details stay private.">
+<meta name="keywords" content="AstroSarangi, Jyotish Kundli, Vedic astrology, free kundli, birth chart, janam kundli, Lahiri ayanamsa, Vimshottari dasha, Yogini dasha, Shadbala, Ashtakavarga, divisional charts, D9 Navamsa, Sade Sati, Panchang">
+<meta name="author" content="AstroSarangi">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+<meta name="theme-color" content="#0a1129">
+<link rel="canonical" href="https://astrosarangi.online/">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192">
+<link rel="icon" href="/icon-48.png" type="image/png" sizes="48x48">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<!-- Google Search Console: paste your verification tag here, e.g. <meta name="google-site-verification" content="XXXX"> -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AstroSarangi">
+<meta property="og:title" content="AstroSarangi – Free Vedic Kundli">
+<meta property="og:description" content="Birth chart, classical D1–D60 divisional charts, KP astrology, Vimshottari and Yogini Dasha, Shadbala, Ashtakavarga and transits. Private and free.">
+<meta property="og:url" content="https://astrosarangi.online/">
+<meta property="og:image" content="https://astrosarangi.online/icon-512.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://astrosarangi.online/icon-512.png">
+<meta name="twitter:title" content="AstroSarangi – Free Vedic Kundli">
+<meta name="twitter:description" content="Vedic Kundli with Dasha, Shadbala, Ashtakavarga and transits.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"AstroSarangi","url":"https://astrosarangi.online/","applicationCategory":"LifestyleApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"INR"},"description":"Free Vedic astrology Kundli generator with divisional charts, Vimshottari and Yogini Dasha, Shadbala, Ashtakavarga and transits.","inLanguage":"en"}</script>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="theme.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <a class="bl" href="/" aria-label="AstroSarangi home"><img class="logo" src="icon-logo.png" width="44" height="44" alt="AstroSarangi logo"><div><h1>AstroSarangi</h1><p>Free Vedic Kundli · Dasha · KP · Divisional charts</p></div></a>
+    <nav class="topnav" aria-label="Main">
+      <button type="button" data-go="form">Free Kundli</button>
+      <button type="button" data-go="tab:chart">Charts</button>
+      <button type="button" data-go="tab:predict">Predictions</button>
+      <button type="button" data-go="kp:chart">KP</button>
+      <button type="button" data-go="sec:kundli">Reports</button>
+      <button type="button" class="cta" data-go="form">Create Kundli</button>
+    </nav>
+  </div>
+</header>
+<main>
+  <section class="hero" aria-label="Welcome">
+    <div>
+      <h2>Read the sky you were <em>born under</em></h2>
+      <p class="lead">A free Vedic birth chart with Dasha, divisional charts, KP astrology and detailed reports, calculated right in your browser.</p>
+      <div class="cta-row"><button type="button" class="btn gold" data-go="form">Create my free Kundli</button><button type="button" class="btn line" data-go="explore">Explore the tools</button></div>
+      <div class="chips"><span>Lahiri ayanamsa</span><span>16 divisional charts</span><span>Vimshottari · Yogini · KP</span><span>Private: runs in your browser</span></div>
+    </div>
+    <svg class="wheel" viewBox="0 0 400 400" role="img" aria-label="Decorative zodiac wheel"><defs><radialGradient id="wg" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#e6b94f" stop-opacity=".18"/><stop offset="1" stop-color="#e6b94f" stop-opacity="0"/></radialGradient></defs><circle cx="200" cy="200" r="196" fill="url(#wg)"/><g class="spin" id="wheelSpin"></g><circle cx="200" cy="200" r="64" fill="none" stroke="#e6b94f" stroke-opacity=".5"/><circle cx="200" cy="200" r="34" fill="#e6b94f" fill-opacity=".14" stroke="#e6b94f" stroke-width="1.5"/><path d="M200 168l10 22 22 10-22 10-10 22-10-22-22-10 22-10z" fill="#f1d28a"/></svg>
+  </section>
+
+  <section class="card form-card" id="formCard">
+    <h2>Birth details</h2>
+    <form id="form" autocomplete="off">
+      <label>Name<input id="name" placeholder="Optional"></label>
+      <div class="row2">
+        <label>Date of birth<input id="date" type="date" required></label>
+        <label>Time of birth<input id="time" type="time" required step="60"></label>
+      </div>
+      <div class="placebox">
+        <label for="place">Place of birth (any city, town or village)</label>
+        <input id="place" type="text" role="combobox" aria-expanded="false" aria-controls="placeList" aria-autocomplete="list" placeholder="Start typing, e.g. Pune, Varanasi, Leicester…">
+        <ul id="placeList" role="listbox" hidden></ul>
+        <p id="placeMsg" class="hint" aria-live="polite"></p>
+      </div>
+      <div class="row3">
+        <label>Latitude (+N)<input id="lat" type="number" step="0.0001" min="-90" max="90" required></label>
+        <label>Longitude (+E)<input id="lon" type="number" step="0.0001" min="-180" max="180" required></label>
+        <label>Time zone<input id="tz" list="tzs" value="Asia/Kolkata" required><datalist id="tzs"></datalist></label>
+      </div>
+      <p class="hint">Choose a suggestion to fill latitude, longitude and time zone, or type them yourself (IANA zone such as Asia/Kolkata or America/New_York). Historic daylight-saving and zone changes are handled.</p>
+      <button class="primary" type="submit">Generate Kundli</button>
+      <p id="error" class="error" hidden></p>
+    </form>
+  </section>
+
+  <section id="result" hidden>
+    <div class="card summary" id="summary"></div>
+    <nav class="tabs" id="tabs">
+      <button data-tab="chart" class="on">Charts</button>
+      <button data-tab="reports">Reports</button>
+      <button data-tab="planets">Planets</button>
+      <button data-tab="vargas">D1–D60 Charts</button>
+      <button data-tab="kp">KP Astrology</button>
+      <button data-tab="dasha">Dasha</button>
+      <button data-tab="predict">Life Predictions</button>
+      <button data-tab="panchang">Panchang &amp; Yogas</button>
+      <button data-tab="shadbala">Shadbala</button>
+      <button data-tab="av">Ashtakavarga</button>
+      <button data-tab="read">Readings</button>
+      <button data-tab="gochar">Transits</button>
+    </nav>
+
+
+      <div class="toolbar">
+        <span>Style:</span>
+        <label class="seg"><input type="radio" name="style" value="north" checked><span>North Indian</span></label>
+        <label class="seg"><input type="radio" name="style" value="south"><span>South Indian</span></label>
+        <label class="seg"><input type="radio" name="style" value="east"><span>East Indian</span></label>
+        <button id="print" type="button" class="ghost">Print / Save PDF</button>
+      </div>
+
+    <div class="tab" id="tab-chart">
+      <div class="charts">
+        <figure class="card"><figcaption><select id="vSel1" class="vsel"></select></figcaption><div id="d1"></div><p class="hint" id="vNote1"></p></figure>
+        <figure class="card"><figcaption><select id="vSel2" class="vsel"></select></figcaption><div id="d9"></div><p class="hint" id="vNote2"></p></figure>
+      </div>
+      <p class="hint">Whole-sign houses. In the North Indian style houses are fixed (top = 1st house) and the small number is the sign; in the South Indian style signs are fixed and “Asc” marks the Lagna; in the East Indian (Bengal/Odisha) style signs are also fixed, with Aries in the top-centre cell and the other signs running anticlockwise, and “Asc” marks the Lagna.</p>
+    </div>
+    <div class="tab" id="tab-kp" hidden>
+      <div class="rsw" id="kpSwitch" role="tablist" aria-label="KP sections"></div>
+      <div id="kpBody"></div>
+    </div>
+    <div class="tab" id="tab-reports" hidden>
+      <div class="rsw" id="repSwitch" role="tablist" aria-label="Report type"></div>
+      <div id="repBody"></div>
+    </div>
+    <div class="tab" id="tab-planets" hidden><div class="card scroll" id="planetsTable"></div></div>
+    <div class="tab" id="tab-vargas" hidden><p class="hint">The 16 classical divisional charts (D1, D2, D3, D4, D7, D9, D10, D12, D16, D20, D24, D27, D30, D40, D45, D60), each drawn independently. Click a chart to enlarge it.</p><div class="gallery" id="vargas"></div></div>
+    <div class="tab" id="tab-predict" hidden>
+      <div class="card" id="pNow"></div>
+      <div class="card" id="pChart"></div>
+      <div class="toolbar">
+        <label class="seg"><input type="radio" name="pview" value="v" checked><span>Vimshottari periods</span></label>
+        <label class="seg"><input type="radio" name="pview" value="y"><span>Yogini periods</span></label>
+        <label class="seg"><input type="radio" name="pview" value="yr"><span>Year by year</span></label>
+      </div>
+      <div class="card" id="pList"></div>
+      <div class="card" id="pWhy"></div>
+    </div>
+    <div class="tab" id="tab-dasha" hidden><div class="card" id="dasha"></div></div>
+    <div class="tab" id="tab-panchang" hidden><div class="card" id="panchang"></div><div class="card" id="yogas"></div></div>
+    <div class="tab" id="tab-shadbala" hidden>
+      <div class="card" id="sbBars"></div>
+      <div class="card" id="sbPct"></div>
+      <div class="card scroll" id="sbTable"></div>
+    </div>
+    <div class="tab" id="tab-av" hidden>
+      <div class="toolbar" id="avSel"></div>
+      <div class="charts">
+        <figure class="card"><figcaption id="avTitle"></figcaption><div id="avChart"></div></figure>
+        <div class="card" id="avBars"></div>
+      </div>
+      <div class="card scroll" id="avTable"></div>
+    </div>
+    <div class="tab" id="tab-read" hidden>
+      <div class="card" id="rdIntro"></div>
+      <div class="card" id="rdPlanets"></div>
+      <div class="card" id="rdHouses"></div>
+    </div>
+    <div class="tab" id="tab-gochar" hidden>
+      <div class="card"><div class="row2" style="align-items:end"><label>Transit date<input id="gDate" type="date"></label><label class="seg" style="margin-bottom:10px"><input type="checkbox" id="gDeg" checked><span>Show degrees on charts</span></label></div><p id="gSade"></p></div>
+      <div class="charts">
+        <figure class="card"><figcaption>Transit chart (Rashi) over your natal Lagna</figcaption><div id="gChart"></div></figure>
+        <figure class="card"><figcaption>Transit Navamsa (D9) over your natal Navamsa Lagna</figcaption><div id="gChart9"></div><p class="hint">Degrees here are measured inside the Navamsa sign.</p></figure>
+      </div>
+      <div class="card" id="gBars"></div>
+      <div class="card" id="gRead"></div>
+      <div class="card scroll" id="gochar"></div>
+    </div>
+  </section>
+
+  <section class="sect" id="explore"><h2>Everything for a complete Kundli reading</h2><p class="sub">Create your chart once, then open any tool. Pick a card below; we will take you there as soon as your Kundli is ready.</p><div class="tiles" id="tiles"></div></section>
+  <section class="sect" id="signs"><h2>The twelve signs</h2><p class="sub">Tap a sign for its element, quality and ruling planet in the Vedic (sidereal) zodiac.</p><div class="zod" id="zod" role="tablist" aria-label="Zodiac signs"></div><div class="card zinfo" id="zinfo" aria-live="polite"></div></section>
+  <section class="sect"><h2>How it works</h2><div class="steps3"><div class="card"><span class="n">1</span><b>Enter birth details</b><p class="hint" style="font-size:14px">Date, time and place of birth. Search any city or town, or type coordinates yourself.</p></div><div class="card"><span class="n">2</span><b>Get your Kundli</b><p class="hint" style="font-size:14px">Lagna, Moon sign, nakshatra and every planet, drawn in North, South or East Indian style.</p></div><div class="card"><span class="n">3</span><b>Go deeper</b><p class="hint" style="font-size:14px">Dashas, strengths, transits, KP significators and reports on marriage, career, numerology and the year ahead.</p></div></div></section>
+  <section class="sect faq"><h2>Questions people ask</h2>
+    <details><summary>Which ayanamsa and house system do you use?</summary><p>The main chart uses the Lahiri (Chitrapaksha) ayanamsa with whole-sign houses. The KP pages use the KP ayanamsa and Placidus house cusps, as KP requires.</p></details>
+    <details><summary>Why does my birth time matter?</summary><p>The Lagna changes about every two hours, and house-based readings depend on it. The Moon sign and nakshatra are usually stable within a few hours, so a rough time still gives useful Moon-based results.</p></details>
+    <details><summary>Is the calculation accurate?</summary><p>Planetary positions are accurate to a fraction of a degree, which is enough for charts and dashas. Check against a professional ephemeris for anything critical.</p></details>
+    <details><summary>Do you store my birth details?</summary><p>No. The calculations run in your browser and your birth date and time are not sent to our server. The last entry is remembered only in your own browser.</p></details>
+    <details><summary>What is KP astrology?</summary><p>Krishnamurti Paddhati judges events through house cusp sub-lords, significators and dasha periods. Open the KP section after creating your Kundli to see them.</p></details>
+    <details><summary>Is this a substitute for an astrologer?</summary><p>No. Readings are rule-based and meant for learning and reflection, not for medical, legal or financial decisions.</p></details>
+  </section>
+  <section class="card about">
+    <h2>About AstroSarangi</h2>
+    <p>AstroSarangi is a free Vedic astrology (Jyotish) birth chart generator. Enter your date, time and place of birth to get your Lagna, Rashi, Nakshatra and planetary positions using the Lahiri ayanamsa and whole-sign houses.</p>
+    <ul>
+      <li>Lagna and Navamsa charts, plus all 16 classical divisional charts (D1 to D60), in North, South and East Indian styles</li>
+      <li>Vimshottari and Yogini Dasha with Antardasha dates and a lifetime outlook timeline</li>
+      <li>Shadbala planetary strength with percentages, and Sarvashtakavarga and Bhinnashtakavarga charts</li>
+      <li>Reports: Kundli analysis, marriage compatibility (Ashtakoota), career and finance, numerology and a yearly horoscope with a Varsha chart</li>
+      <li>Panchang, yogas and doshas (Manglik, Kaal Sarp, Gajakesari and more), current transits and Sade Sati</li>
+    </ul>
+    <p class="hint">Marriage matching uses the Ashtakoota tables as published by common sources: Varna by Moon sign; Vashya and Gana read bride-by-groom; Tara by nakshatra count; Yoni simplified to same animal 4, sworn enemies 0, others 2; Graha Maitri by natural friendship; Bhakoot 2/12, 5/9 and 6/8 score 0; Nadi same scores 0. Sources differ slightly on Vashya, Gana direction and Yoni, so scores can differ from other calculators.</p>
+    <p class="hint">All calculations run in your browser. Your birth date and time are not sent to any server; only a place name you type is looked up to find coordinates. Results are for learning and reflection, not professional advice.</p>
+  </section>
+</main>
+<dialog id="zoom"><button id="zoomClose" class="ghost" type="button">Close ✕</button><h3 id="zoomTitle"></h3><div id="zoomBody"></div><p class="hint" id="zoomNote"></p></dialog>
+<footer><div class="fwrap"><div class="fcols">
+  <div><h4>AstroSarangi</h4><p>Free Vedic astrology tools: birth chart, Dasha, divisional charts, KP astrology and detailed reports.</p><p><b>Phone:</b> <a href="tel:+918637895349" style="display:inline">+91 86378 95349</a><br><b>Email:</b> <a href="mailto:ppsendorsed2105@gmail.com" style="display:inline">ppsendorsed2105@gmail.com</a></p></div>
+  <div><h4>Explore</h4><a href="#formCard" data-go="form">Free Kundli</a><a href="#explore" data-go="tab:vargas">Divisional charts</a><a href="#explore" data-go="tab:predict">Life predictions</a><a href="#explore" data-go="kp:chart">KP astrology</a><a href="#explore" data-go="sec:marriage">Marriage matching</a></div>
+  <div><h4>Company</h4><a href="contact.html">Contact us</a><a href="terms.html">Terms of service</a><a href="privacy.html">Privacy policy</a></div>
+</div><p class="fsmall">Charts and reports are calculated in your browser; your birth date and time never leave it. When you search for a place, only the place name you type is sent to Open-Meteo's free geocoding service. Planetary positions are accurate to a fraction of a degree — verify against a professional ephemeris before relying on them. For reflection and entertainment, not professional advice. Offline place data: <a href="https://github.com/dr5hn/countries-states-cities-database" rel="noopener" target="_blank">countries-states-cities-database</a> (ODbL 1.0).</p></div></footer>
+<script src="engine.js"></script>
+<script src="predict.js"></script>
+<script src="bala.js"></script>
+<script src="reading.js"></script>
+<script src="texts.js"></script>
+<script src="koota.js"></script>
+<script src="numerology.js"></script>
+<script src="reports.js"></script>
+<script src="kp.js"></script>
+<script src="service.js"></script>
+<script src="cities.js"></script>
+<script src="geo.js"></script>
+<script src="place.js"></script>
+<script src="app.js"></script>
+<script src="sections.js"></script>
+<script src="kp-ui.js"></script>
+<script src="nav.js"></script>
+<script src="home.js"></script>
+</body>
+</html>
