@@ -152,3 +152,7 @@ html[data-pal="creamnavy"] .toast{color:#fff;background:#14214f}
 .tile:hover .go u{transform:translateX(5px)}
 @media(max-width:1000px){.tiles{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:560px){.tiles{grid-template-columns:1fr}.tile .art{height:120px}}
+
+#langSel{margin-left:6px;background:rgba(var(--wr),.06);color:var(--ink);border:1px solid var(--line2);border-radius:999px;padding:7px 10px;font:600 13px inherit;cursor:pointer;width:auto;min-width:0}
+#langSel:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+html[lang="hi"] body,html[lang="bn"] body,html[lang="or"] body{line-height:1.65}
