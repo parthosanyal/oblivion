@@ -2,9 +2,9 @@
  * Used by the Node server (paid reports) and by the single-file demo build (no payments).
  */
 (function (root, factory) {
-  if (typeof module === 'object' && module.exports) module.exports = factory(require('../public/engine.js'), require('../public/predict.js'), require('./reports.js'), require('./koota.js'));
-  else root.ReportService = factory(root.VedicEngine, root.Predict, root.Reports, root.Koota);
-})(typeof self !== 'undefined' ? self : this, function (E, P, R, K) {
+  if (typeof module === 'object' && module.exports) module.exports = factory(require('../public/engine.js'), require('../public/predict.js'), require('./reports.js'), require('./koota.js'), require('./pro.js'));
+  else root.ReportService = factory(root.VedicEngine, root.Predict, root.Reports, root.Koota, root.Pro);
+})(typeof self !== 'undefined' ? self : this, function (E, P, R, K, Pro) {
   const TYPES = ['kundli', 'marriage', 'career', 'numerology', 'yearly'];
   const TITLES = { kundli: 'Kundli analysis', marriage: 'Marriage compatibility', career: 'Career and finance', numerology: 'Numerology report', yearly: 'Yearly horoscope' };
 
@@ -38,7 +38,7 @@
     if (!req || !TYPES.includes(req.type)) throw new Error('Unknown report.');
     const now = nowMs != null ? nowMs : Date.now(), b = cleanBirth(req.birth), { chart, pred } = base(b, now);
     let rep;
-    if (req.type === 'kundli') rep = R.kundli(chart, pred);
+    if (req.type === 'kundli') rep = Pro.kundli(chart, pred, b);
     else if (req.type === 'career') rep = R.career(chart, pred);
     else if (req.type === 'numerology') rep = R.numerology(b, typeof req.numName === 'string' ? req.numName.replace(/[\u0000-\u001f<>]/g, '').slice(0, 80) : null, new Date(now));
     else if (req.type === 'yearly') {
@@ -47,13 +47,14 @@
       rep = R.yearly(chart, pred, y);
       rep.year = y; rep.firstYear = first; rep.lastYear = last; rep.currentYear = def;
     } else {
-      let res = null, names;
+      let res = null, names, pcx = null, pcRole = null;
       if (req.partner) {
         const p = cleanBirth(req.partner), role = req.partner.role === 'bride' ? 'bride' : 'groom', pc = chartOf(p);
         const bride = role === 'groom' ? pc : chart, groom = role === 'groom' ? chart : pc, mn = b.name || 'You', pn = p.name || 'Partner';
         res = K.match(bride, groom); names = role === 'groom' ? { bride: pn, groom: mn } : { bride: mn, groom: pn };
+        pcx = pc; pcRole = role;
       }
-      rep = R.marriage(chart, pred, res, names);
+      rep = res ? Pro.marriage(chart, pred, res, names, pcx, P.compute(pcx, now), pcRole) : Pro.marriage(chart, pred, null, names);
       rep.matched = !!res;
     }
     const out = { type: req.type, points: rep.points, meta: {} };
