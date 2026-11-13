@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en" data-pal="maroon">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Planet Positions in Your Kundli – Sign, House, Nakshatra &amp; Dignity | AstroSarangi</title>
+<meta name="description" content="See where each of the nine Vedic planets stood at your birth: sign, degree, house, nakshatra with pada, retrograde status and dignity. Free, Lahiri ayanamsa.">
+<meta name="author" content="AstroSarangi">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+<meta name="theme-color" content="#0a1129">
+<link rel="canonical" href="https://astrosarangi.online/planet-positions">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192">
+<link rel="icon" href="/icon-48.png" type="image/png" sizes="48x48">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<!-- Google Search Console: paste your verification tag here, e.g. <meta name="google-site-verification" content="XXXX"> -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AstroSarangi">
+<meta property="og:title" content="Planet Positions in Your Kundli – AstroSarangi">
+<meta property="og:description" content="See where each of the nine Vedic planets stood at your birth: sign, degree, house, nakshatra with pada, retrograde status and dignity. Free, Lahiri ayanamsa.">
+<meta property="og:url" content="https://astrosarangi.online/planet-positions">
+<meta property="og:image" content="https://astrosarangi.online/icon-512.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://astrosarangi.online/icon-512.png">
+<meta name="twitter:title" content="AstroSarangi – Free Vedic Kundli">
+<meta name="twitter:description" content="Vedic Kundli with Dasha, Shadbala, Ashtakavarga and transits.">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebPage","name":"Planet Positions in Your Kundli","url":"https://astrosarangi.online/planet-positions","description":"See where each of the nine Vedic planets stood at your birth: sign, degree, house, nakshatra with pada, retrograde status and dignity. Free, Lahiri ayanamsa.","isPartOf":{"@type":"WebSite","name":"AstroSarangi","url":"https://astrosarangi.online/"}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What does retrograde mean in a Kundli?","acceptedAnswer":{"@type":"Answer","text":"The planet appears to move backwards from Earth. In Vedic astrology it is read as strong in effort but slower and more inward in result."}},{"@type":"Question","name":"What is combustion?","acceptedAnswer":{"@type":"Answer","text":"A planet very close to the Sun is called combust, and its significations are thought to be overshadowed."}},{"@type":"Question","name":"Why are Rahu and Ketu included?","acceptedAnswer":{"@type":"Answer","text":"They are the Moon’s nodes. They are not bodies but are used as shadow planets in Parashara Jyotish Shastra."}}]}]}</script>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="pages.css">
+</head>
+<body class="subpage" data-page="tab:planets">
+<header class="top">
+  <div class="brand">
+    <a class="bl" href="/" aria-label="AstroSarangi home"><img class="logo" src="icon-logo.png" width="44" height="44" alt="AstroSarangi logo"><div><h1>AstroSarangi</h1><p>Free Vedic Kundli · Dasha · KP · Divisional charts</p></div></a>
+    <nav class="topnav" aria-label="Main">
+<button type="button" data-go="form">Free Kundli</button>
+<a href="/birth-chart" data-go="tab:chart">Birth Chart</a>
+<a href="/divisional-charts" data-go="tab:vargas">Divisional Charts</a>
+<a href="/predictions" data-go="tab:predict">Predictions</a>
+<a href="/kp-astrology" data-go="kp:chart">KP</a>
+<a href="/kundli-analysis" data-go="sec:kundli">Reports</a>
+<a href="/free-tools">All Tools</a>
+<button type="button" class="cta" data-go="form">Create Kundli</button>
+</nav>
+  </div>
+</header>
+<main>
+  <section class="pagehero"><p class="crumb"><a href="/">AstroSarangi</a> › Planets</p><h2>Planet Positions in Your Kundli</h2><p class="lead">Every planet at your birth: sign, degree, house, nakshatra and whether it is strong or weak.</p></section>
+
+  <section class="card form-card" id="formCard">
+    <h2>Birth details</h2>
+    <form id="form" autocomplete="off">
+      <label>Name<input id="name" placeholder="Optional"></label>
+      <div class="row2">
+        <label>Date of birth<input id="date" type="date" required></label>
+        <label>Time of birth<input id="time" type="time" required step="60"></label>
+      </div>
+      <div class="placebox">
+        <label for="place">Place of birth (any city, town or village)</label>
+        <input id="place" type="text" role="combobox" aria-expanded="false" aria-controls="placeList" aria-autocomplete="list" placeholder="Start typing, e.g. Pune, Varanasi, Leicester…">
+        <ul id="placeList" role="listbox" hidden></ul>
+        <p id="placeMsg" class="hint" aria-live="polite"></p>
+      </div>
+      <div class="row3">
+        <label>Latitude (+N)<input id="lat" type="number" step="0.0001" min="-90" max="90" required></label>
+        <label>Longitude (+E)<input id="lon" type="number" step="0.0001" min="-180" max="180" required></label>
+        <label>Time zone<input id="tz" list="tzs" value="Asia/Kolkata" required><datalist id="tzs"></datalist></label>
+      </div>
+      <p class="hint">Choose a suggestion to fill latitude, longitude and time zone, or type them yourself (IANA zone such as Asia/Kolkata or America/New_York). Historic daylight-saving and zone changes are handled.</p>
+      <button class="primary" type="submit">Generate Kundli</button>
+      <p id="error" class="error" hidden></p>
+    </form>
+  </section>
+
+  <section id="result" hidden>
+    <div class="card summary" id="summary"></div>
+    <nav class="tabs" id="tabs">
+      <button data-tab="chart" class="on">Charts</button>
+      <button data-tab="reports">Reports</button>
+      <button data-tab="planets">Planets</button>
+      <button data-tab="vargas">D1–D60 Charts</button>
+      <button data-tab="kp">KP Astrology</button>
+      <button data-tab="dasha">Dasha</button>
+      <button data-tab="predict">Life Predictions</button>
+      <button data-tab="panchang">Panchang &amp; Yogas</button>
+      <button data-tab="shadbala">Shadbala</button>
+      <button data-tab="av">Ashtakavarga</button>
+      <button data-tab="read">Readings</button>
+      <button data-tab="gochar">Transits</button>
+    </nav>
+
+
+      <div class="toolbar">
+        <span>Style:</span>
+        <label class="seg"><input type="radio" name="style" value="north" checked><span>North Indian</span></label>
+        <label class="seg"><input type="radio" name="style" value="south"><span>South Indian</span></label>
+        <label class="seg"><input type="radio" name="style" value="east"><span>East Indian</span></label>
+        <button id="print" type="button" class="ghost">Print / Save PDF</button>
+      </div>
+
+    <div class="tab" id="tab-chart">
+      <div class="charts">
+        <figure class="card"><figcaption><select id="vSel1" class="vsel"></select></figcaption><div id="d1"></div><p class="hint" id="vNote1"></p></figure>
+        <figure class="card"><figcaption><select id="vSel2" class="vsel"></select></figcaption><div id="d9"></div><p class="hint" id="vNote2"></p></figure>
+      </div>
+      <p class="hint">Whole-sign houses. In the North Indian style houses are fixed (top = 1st house) and the small number is the sign; in the South Indian style signs are fixed and “Asc” marks the Lagna; in the East Indian (Bengal/Odisha) style signs are also fixed, with Aries in the top-centre cell and the other signs running anticlockwise, and “Asc” marks the Lagna.</p>
+    </div>
+    <div class="tab" id="tab-kp" hidden>
+      <div class="rsw" id="kpSwitch" role="tablist" aria-label="KP sections"></div>
+      <div id="kpBody"></div>
+    </div>
+    <div class="tab" id="tab-reports" hidden>
+      <div class="rsw" id="repSwitch" role="tablist" aria-label="Report type"></div>
+      <div id="repBody"></div>
+    </div>
+    <div class="tab" id="tab-planets" hidden><div class="card scroll" id="planetsTable"></div></div>
+    <div class="tab" id="tab-vargas" hidden><p class="hint">The 16 classical divisional charts (D1, D2, D3, D4, D7, D9, D10, D12, D16, D20, D24, D27, D30, D40, D45, D60), each drawn independently. Click a chart to enlarge it.</p><div class="gallery" id="vargas"></div></div>
+    <div class="tab" id="tab-predict" hidden>
+      <div class="card" id="pNow"></div>
+      <div class="card" id="pChart"></div>
+      <div class="toolbar">
+        <label class="seg"><input type="radio" name="pview" value="v" checked><span>Vimshottari periods</span></label>
+        <label class="seg"><input type="radio" name="pview" value="y"><span>Yogini periods</span></label>
+        <label class="seg"><input type="radio" name="pview" value="yr"><span>Year by year</span></label>
+      </div>
+      <div class="card" id="pList"></div>
+      <div class="card" id="pWhy"></div>
+    </div>
+    <div class="tab" id="tab-dasha" hidden><div class="card" id="dasha"></div></div>
+    <div class="tab" id="tab-panchang" hidden><div class="card" id="panchang"></div><div class="card" id="yogas"></div></div>
+    <div class="tab" id="tab-shadbala" hidden>
+      <div class="card" id="sbBars"></div>
+      <div class="card" id="sbPct"></div>
+      <div class="card scroll" id="sbTable"></div>
+    </div>
+    <div class="tab" id="tab-av" hidden>
+      <div class="toolbar" id="avSel"></div>
+      <div class="charts">
+        <figure class="card"><figcaption id="avTitle"></figcaption><div id="avChart"></div></figure>
+        <div class="card" id="avBars"></div>
+      </div>
+      <div class="card scroll" id="avTable"></div>
+    </div>
+    <div class="tab" id="tab-read" hidden>
+      <div class="card" id="rdIntro"></div>
+      <div class="card" id="rdPlanets"></div>
+      <div class="card" id="rdHouses"></div>
+    </div>
+    <div class="tab" id="tab-gochar" hidden>
+      <div class="card"><div class="row2" style="align-items:end"><label>Transit date<input id="gDate" type="date"></label><label class="seg" style="margin-bottom:10px"><input type="checkbox" id="gDeg" checked><span>Show degrees on charts</span></label></div><p id="gSade"></p></div>
+      <div class="charts">
+        <figure class="card"><figcaption>Transit chart (Rashi) over your natal Lagna</figcaption><div id="gChart"></div></figure>
+        <figure class="card"><figcaption>Transit Navamsa (D9) over your natal Navamsa Lagna</figcaption><div id="gChart9"></div><p class="hint">Degrees here are measured inside the Navamsa sign.</p></figure>
+      </div>
+      <div class="card" id="gBars"></div>
+      <div class="card" id="gRead"></div>
+      <div class="card scroll" id="gochar"></div>
+    </div>
+  </section>
+
+  <section class="card about pgtext"><h2>About the planets</h2><p>The planet table is the base of every Vedic reading. For the Sun, Moon, Mars, Mercury, Jupiter, Venus, Saturn, Rahu and Ketu it lists the sign and exact degree, the house counted from your Lagna, the nakshatra and pada, and whether the planet is retrograde or combust.</p><p>The dignity column shows whether a planet is exalted, in its own sign, in a friend’s or an enemy’s sign, or debilitated. Positions are sidereal, calculated with the Lahiri ayanamsa, and the whole table is worked out in your browser.</p><h2>What you get</h2><ul><li>Sign, degree and house of the nine planets</li><li>Nakshatra and pada for each planet</li><li>Retrograde and combust marks</li><li>Dignity: exalted, own sign, friend, enemy or debilitated</li><li>Lord of every house in your chart</li></ul><h2>How to read it</h2><p>Read the table from the Lagna lord outward. A planet in an own or exalted sign gives its results more easily, a retrograde planet works inward and slowly, and a planet close to the Sun may lose strength. Always check the sign and the house together, not one alone.</p><h2>Frequently asked questions</h2><details><summary>What does retrograde mean in a Kundli?</summary><p>The planet appears to move backwards from Earth. In Vedic astrology it is read as strong in effort but slower and more inward in result.</p></details><details><summary>What is combustion?</summary><p>A planet very close to the Sun is called combust, and its significations are thought to be overshadowed.</p></details><details><summary>Why are Rahu and Ketu included?</summary><p>They are the Moon’s nodes. They are not bodies but are used as shadow planets in Parashara Jyotish Shastra.</p></details></section>
+  <section class="sect"><h2>More free tools</h2><div class="tiles"><a href="/birth-chart" class="tile" data-go="tab:chart"><span class="art a0" aria-hidden="true"><svg viewBox="0 0 200 120" preserveAspectRatio="xMidYMid slice"><g fill="none" stroke="currentColor" stroke-opacity=".35"><circle cx="100" cy="60" r="26"/><circle cx="100" cy="60" r="44"/><circle cx="100" cy="60" r="64" stroke-dasharray="2 6"/><path d="M0 60H200M100 0V120" stroke-opacity=".12"/></g><g fill="currentColor"><circle cx="28" cy="26" r="1.6"/><circle cx="168" cy="30" r="2"/><circle cx="150" cy="96" r="1.4"/><circle cx="46" cy="92" r="2"/><circle cx="176" cy="70" r="1.2"/><circle cx="18" cy="66" r="1.2"/></g></svg><i>🪐</i></span><b>Birth Chart</b><span class="tg">Your sky at the moment of birth</span><span class="d">Your sky at the moment of birth: Lagna, Moon sign, nakshatra and every planet, drawn in the North, South or East Indian style.</span><span class="go">Explore free now <u>→</u></span></a><a href="/shadbala" class="tile" data-go="tab:shadbala"><span class="art a1" aria-hidden="true"><svg viewBox="0 0 200 120" preserveAspectRatio="xMidYMid slice"><g fill="none" stroke="currentColor" stroke-opacity=".35"><circle cx="100" cy="60" r="26"/><circle cx="100" cy="60" r="44"/><circle cx="100" cy="60" r="64" stroke-dasharray="2 6"/><path d="M0 60H200M100 0V120" stroke-opacity=".12"/></g><g fill="currentColor"><circle cx="28" cy="26" r="1.6"/><circle cx="168" cy="30" r="2"/><circle cx="150" cy="96" r="1.4"/><circle cx="46" cy="92" r="2"/><circle cx="176" cy="70" r="1.2"/><circle cx="18" cy="66" r="1.2"/></g></svg><i>💪</i></span><b>Shadbala</b><span class="tg">How strong is each planet</span><span class="d">How strong each planet is in your chart, measured the classical six ways.</span><span class="go">Explore free now <u>→</u></span></a><a href="/chart-readings" class="tile" data-go="tab:read"><span class="art a2" aria-hidden="true"><svg viewBox="0 0 200 120" preserveAspectRatio="xMidYMid slice"><g fill="none" stroke="currentColor" stroke-opacity=".35"><circle cx="100" cy="60" r="26"/><circle cx="100" cy="60" r="44"/><circle cx="100" cy="60" r="64" stroke-dasharray="2 6"/><path d="M0 60H200M100 0V120" stroke-opacity=".12"/></g><g fill="currentColor"><circle cx="28" cy="26" r="1.6"/><circle cx="168" cy="30" r="2"/><circle cx="150" cy="96" r="1.4"/><circle cx="46" cy="92" r="2"/><circle cx="176" cy="70" r="1.2"/><circle cx="18" cy="66" r="1.2"/></g></svg><i>📖</i></span><b>Readings</b><span class="tg">Your chart in plain words</span><span class="d">What each planet and each house in your chart is said to mean, in plain language.</span><span class="go">Explore free now <u>→</u></span></a><a href="/free-tools" class="tile"><span class="art a3" aria-hidden="true"><svg viewBox="0 0 200 120" preserveAspectRatio="xMidYMid slice"><g fill="none" stroke="currentColor" stroke-opacity=".35"><circle cx="100" cy="60" r="26"/><circle cx="100" cy="60" r="44"/><circle cx="100" cy="60" r="64" stroke-dasharray="2 6"/><path d="M0 60H200M100 0V120" stroke-opacity=".12"/></g><g fill="currentColor"><circle cx="28" cy="26" r="1.6"/><circle cx="168" cy="30" r="2"/><circle cx="150" cy="96" r="1.4"/><circle cx="46" cy="92" r="2"/><circle cx="176" cy="70" r="1.2"/><circle cx="18" cy="66" r="1.2"/></g></svg><i>✨</i></span><b>All free tools</b><span class="tg">Every tool in one place</span><span class="d">See all 21 AstroSarangi tools, grouped by topic.</span><span class="go">View all <u>→</u></span></a></div></section>
+</main>
+<dialog id="zoom"><button id="zoomClose" class="ghost" type="button">Close ✕</button><h3 id="zoomTitle"></h3><div id="zoomBody"></div><p class="hint" id="zoomNote"></p></dialog>
+<footer><div class="fwrap"><div class="fcols">
+  <div><h4>AstroSarangi</h4><p>Free Vedic astrology tools: birth chart, Dasha, divisional charts, KP astrology and detailed reports.</p><p><b>Phone:</b> <a href="tel:+918637895349" style="display:inline">+91 86378 95349</a><br><b>Email:</b> <a href="mailto:ppsendorsed2105@gmail.com" style="display:inline">ppsendorsed2105@gmail.com</a></p></div>
+  <div class="fexp"><h4>Explore</h4><a href="#formCard" data-go="form">Free Kundli</a><a href="/birth-chart" data-go="tab:chart">Birth Chart</a><a href="/divisional-charts" data-go="tab:vargas">Divisional Charts</a><a href="/predictions" data-go="tab:predict">Predictions</a><a href="/planet-positions" data-go="tab:planets">Planets</a><a href="/panchang-and-yogas" data-go="tab:panchang">Panchang &amp; Yogas</a><a href="/dasha-periods" data-go="tab:dasha">Dasha</a><a href="/transits-and-sade-sati" data-go="tab:gochar">Transits</a><a href="/shadbala" data-go="tab:shadbala">Shadbala</a><a href="/ashtakavarga" data-go="tab:av">Ashtakavarga</a><a href="/chart-readings" data-go="tab:read">Readings</a><a href="/kp-astrology" data-go="kp:chart">KP Planets &amp; Cusps</a><a href="/kp-significators" data-go="kp:sig">KP Significators</a><a href="/kp-cuspal-sublords" data-go="kp:csl">KP Cuspal Sub-Lords</a><a href="/kp-dasha-timing" data-go="kp:dasha">KP Dasha &amp; Timing</a><a href="/kp-ruling-planets" data-go="kp:rp">KP Ruling Planets</a><a href="/kp-horary" data-go="kp:horary">KP Horary 1–249</a><a href="/kundli-analysis" data-go="sec:kundli">Kundli Analysis</a><a href="/marriage-matching" data-go="sec:marriage">Marriage Matching</a><a href="/career-and-finance" data-go="sec:career">Career &amp; Finance</a><a href="/numerology" data-go="sec:numerology">Numerology</a><a href="/yearly-horoscope" data-go="sec:yearly">Yearly Horoscope</a><a href="/free-tools">All free tools</a></div>
+  <div><h4>Company</h4><a href="contact.html">Contact us</a><a href="terms.html">Terms of service</a><a href="privacy.html">Privacy policy</a></div>
+</div><p class="fsmall">Charts and reports are calculated in your browser; your birth date and time never leave it. When you search for a place, only the place name you type is sent to Open-Meteo's free geocoding service. Planetary positions are accurate to a fraction of a degree — verify against a professional ephemeris before relying on them. For reflection and entertainment, not professional advice. Offline place data: <a href="https://github.com/dr5hn/countries-states-cities-database" rel="noopener" target="_blank">countries-states-cities-database</a> (ODbL 1.0).</p></div></footer>
+<script src="engine.js"></script>
+<script src="predict.js"></script>
+<script src="bala.js"></script>
+<script src="reading.js"></script>
+<script src="texts.js"></script>
+<script src="koota.js"></script>
+<script src="numerology.js"></script>
+<script src="reports.js"></script>
+<script src="kp.js"></script>
+<script src="service.js"></script>
+<script src="cities.js"></script>
+<script src="geo.js"></script>
+<script src="place.js"></script>
+<script src="app.js"></script>
+<script src="sections.js"></script>
+<script src="kp-ui.js"></script>
+<script src="nav.js"></script>
+<script src="pages-map.js"></script>
+<script src="home.js"></script>
+<script src="i18n-data.js"></script>
+<script src="i18n.js"></script>
+<script src="page.js"></script>
+</body>
+</html>
