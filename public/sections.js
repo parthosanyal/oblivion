@@ -12,7 +12,7 @@
   sw.innerHTML = SECTIONS.map(([k, t]) => `<button type="button" data-sec="${k}" role="tab">${t}</button>`).join('');
   sw.addEventListener('click', e => { const b = e.target.closest('[data-sec]'); if (!b) return; st.cur = b.dataset.sec; render(); });
   document.addEventListener('kundli:ready', () => { st.partnerReq = null; st.nameInput = null; st.year = null; st.open = {}; render(); });
-  document.querySelectorAll('input[name=style]').forEach(r => r.addEventListener('change', fillVarsha));
+  document.querySelectorAll('input[name=style]').forEach(r => r.addEventListener('change', () => { fillVarsha(); if (window.JK && window.JK.chart && document.getElementById('repChart')) drawMain(window.JK.chart); }));
 
   // ---------- data ----------
   const birthOf = () => { const i = window.JK.chart.input; return { name: i.name || '', year: i.year, month: i.month, day: i.day, hour: i.hour, minute: i.minute, lat: i.lat, lon: i.lon, tz: i.tz }; };
@@ -39,15 +39,27 @@
     const t = $('pt-' + i); if (t) t.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'nearest' });
   }
   $('repBody').addEventListener('click', e => {
+    if (e.target.closest('[data-print]')) { printReport(); return; }
     const g = e.target.closest('[data-go]'); if (g) { go(+g.dataset.go); return; }
     const a = e.target.closest('[data-all]'); if (a) { $('repBody').querySelectorAll('details.pt').forEach(d => d.open = a.dataset.all === '1'); return; }
     if (e.target.id === 'retryBtn') { render(); }
   });
 
   // ---------- main render ----------
-  const TITLE = { kundli: ['Kundli analysis', 'A reading of your own birth chart in ten points: personality, mind, planets, strengths, yogas, houses, chart balance and the dasha you are in.'], marriage: ['Marriage compatibility', 'First your own marriage indicators, then an Ashtakoota (36-point Guna Milan) match with a partner\'s chart.'], career: ['Career and finance', 'The 10th, 2nd and 11th houses, suitable work areas, wealth combinations and a ten-year momentum view.'], numerology: ['Numerology report', 'Western (Pythagorean) and Indian (Chaldean) numbers from your birth date and name.'], yearly: ['Yearly horoscope', 'A year runs from one birthday to the next. Pick a year to see its dasha, Varsha (solar return) chart, life-area ratings and month-by-month outlook.'] };
+  const TITLE = { kundli: ['Kundli analysis', 'A full-length report on your birth chart: personality, mind, planets, strength, a wide scan of yogas and doshas, the twelve houses, your dasha now, and a year-by-year forecast for the next ten years. Print or save it as a PDF.'], marriage: ['Marriage compatibility', 'Add your partner\'s details to compare both charts side by side: both 7th houses, Venus, Jupiter, Navamsa, Mangal dosha, dashas and timing, plus the 36-point Guna Milan and one overall verdict. Print or save it as a PDF.'], career: ['Career and finance', 'The 10th, 2nd and 11th houses, suitable work areas, wealth combinations and a ten-year momentum view.'], numerology: ['Numerology report', 'Western (Pythagorean) and Indian (Chaldean) numbers from your birth date and name.'], yearly: ['Yearly horoscope', 'A year runs from one birthday to the next. Pick a year to see its dasha, Varsha (solar return) chart, life-area ratings and month-by-month outlook.'] };
   const intro = t => `<div class="card"><h2>${TITLE[t][0]}</h2><p class="hint" style="margin-bottom:0">${TITLE[t][1]} Step through the numbered points. These are rule-based readings for reflection, not a substitute for a consultation.</p></div>`;
 
+  function printBar(type) {
+    const i = window.JK.chart.input, n = st.partnerReq && type === 'marriage' ? `${esc(i.name || 'You')} and ${esc(st.partnerReq.name || 'Partner')}` : esc(i.name || '');
+    const pad = x => String(x).padStart(2, '0');
+    return `<div class="card printbar"><button type="button" class="primary" data-print="1">Print / Save full report (PDF)</button><span class="hint" style="margin:0 0 0 10px">Opens every section in one printable document.</span></div>` +
+      `<div class="print-cover"><div class="pc-brand">AstroSarangi</div><h1>${esc(TITLE[type][0])}</h1>${n ? `<h2>${n}</h2>` : ''}<p>Born ${i.day}/${i.month}/${i.year} at ${pad(i.hour)}:${pad(i.minute)}, ${esc(i.place || '')} (${esc(i.tz)})</p><p>Prepared on ${new Date().toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' })} · astrosarangi.online</p><p class="pc-note">Rule-based Vedic astrology for reflection. Not a substitute for professional advice.</p></div>`;
+  }
+  function printReport() {
+    const all = [...document.querySelectorAll('#repBody details')], was = all.map(d => d.open); all.forEach(d => { d.open = true; }); document.body.classList.add('print-rep');
+    const done = () => { document.body.classList.remove('print-rep'); all.forEach((d, k) => { d.open = was[k]; }); window.removeEventListener('afterprint', done); };
+    window.addEventListener('afterprint', done); window.print();
+  }
   async function render() {
     const J = window.JK, my = ++seq; sw.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.sec === st.cur));
     const body = $('repBody'); if (!J) { body.innerHTML = '<div class="card"><p class="hint">Generate a Kundli first.</p></div>'; return; }
@@ -63,7 +75,8 @@
     if (type === 'kundli') head = `<div class="card" id="repChartCard"><div id="repChart" class="repchart"></div></div>`;
     if (type === 'yearly') head = yearlyHead(m);
     const wall = '';
-    $('repArea').innerHTML = (type === 'marriage' && st.partnerReq && !out.paid ? '' : '') + head + wall + pointsHtml(out.points, type);
+    const full = type === 'kundli' || type === 'career' || (type === 'marriage' && st.partnerReq);
+    $('repArea').innerHTML = (full ? printBar(type) : '') + head + wall + pointsHtml(out.points, type);
     if (type === 'kundli') drawMain(J.chart);
     if (type === 'yearly') { varsha = out.varsha || null; fillVarsha(); }
     wireYearly();

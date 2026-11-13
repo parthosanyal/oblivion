@@ -18,11 +18,13 @@
 
   function pageChart(k) {
     const J = window.JK, signs = k.cusps.map(c => c.sign), bodies = k.planets.map(p => ({ house: p.house - 1, sign: p.sign, label: J.ABBR[p.key] + (p.retro && !['Rahu', 'Ketu'].includes(p.key) ? '℞' : '') }));
-    const svg = J.northSvg(signs[0], bodies, { signs });
+    const style = (document.querySelector('input[name=style]:checked') || {}).value || 'north';
+    const svg = style === 'north' ? J.northSvg(signs[0], bodies, { signs })
+      : J.svgByStyle(style)(signs[0], k.planets.map(p => ({ sign: p.sign, label: J.ABBR[p.key] + (p.retro && !['Rahu', 'Ketu'].includes(p.key) ? '℞' : '') })));
     const cr = k.cusps.map(c => [c.n, c.signName, dms(c.deg), c.signLord, c.star, `<b>${c.sub}</b>`, c.subsub]);
     const pr = k.planets.map(p => [p.key + (p.retro && !['Rahu', 'Ketu'].includes(p.key) ? ' ℞' : ''), p.signName, dms(p.deg), p.house, p.signLord, p.star, `<b>${p.sub}</b>`, p.subsub]);
     return intro('KP chart: planets and cusps', 'The Krishnamurti Paddhati chart: 12 Placidus house cusps, and for every planet and cusp its sign lord, star lord, sub lord and sub-sub lord. The sub lord is the heart of KP: it decides whether a house matter is promised.') +
-      `<div class="card"><h3 style="margin-top:0">Bhava chart</h3><div class="repchart">${svg}</div><p class="hint">Planets sit in the house whose Placidus cusps contain them (not necessarily the sign shown in the whole-sign chart). The small number in each house is the sign on its cusp.</p></div>` +
+      `<div class="card"><h3 style="margin-top:0">Bhava chart</h3><div class="repchart">${svg}</div><p class="hint">Planets sit in the house whose Placidus cusps contain them (not necessarily the sign shown in the whole-sign chart). In the North Indian style the small number in each house is the sign on its cusp; in the South and East styles planets are shown in their sign, and the KP house of each planet is in the table below.</p></div>` +
       `<div class="card"><h3 style="margin-top:0">House cusps (Placidus)</h3>${table(['Cusp', 'Sign', 'Degree', 'Sign lord', 'Star lord', 'Sub lord', 'Sub-sub'], cr)}</div>` +
       `<div class="card"><h3 style="margin-top:0">Planets</h3>${table(['Planet', 'Sign', 'Degree', 'House', 'Sign lord', 'Star lord', 'Sub lord', 'Sub-sub'], pr)}${NOTE}</div>`;
   }

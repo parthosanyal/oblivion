@@ -173,4 +173,23 @@ body:not(.subpage) #result>*:not(#summary){display:none!important}
 .today .hint{margin:10px 0 0}
 @media(max-width:900px){.today .tg{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:560px){.today .tg{grid-template-columns:repeat(2,1fr)}}
-body.has-chart .today{display:none}
+
+/* Printable full report */
+.print-cover{display:none}
+@media print{
+  body.print-rep *{visibility:hidden!important}
+  body.print-rep #tab-reports,body.print-rep #tab-reports *{visibility:visible!important}
+  body.print-rep #tab-reports{position:absolute;left:0;top:0;width:100%;display:block!important}
+  body.print-rep .pnav,body.print-rep .pctl,body.print-rep .pfoot,body.print-rep .printbar,body.print-rep #repSwitch,body.print-rep #pForm,body.print-rep .toolbar{display:none!important}
+  body.print-rep .print-cover{display:block!important;text-align:center;padding:90px 20px 70px;page-break-after:always;color:#000}
+  body.print-rep .print-cover h1{font-size:34px;margin:12px 0}
+  body.print-rep .print-cover h2{font-size:22px;font-weight:400}
+  body.print-rep .pc-brand{letter-spacing:.3em;text-transform:uppercase;font-size:14px}
+  body.print-rep .pc-note{margin-top:60px;font-size:12px}
+  body.print-rep details.pt{page-break-inside:auto;border:0;margin:0 0 14px;background:none}
+  body.print-rep details.pt>summary{font-size:18px;font-weight:700;border-bottom:1px solid #999;padding:6px 0;list-style:none}
+  body.print-rep details.rcard,body.print-rep .yoga,body.print-rep .hb{page-break-inside:avoid}
+  body.print-rep .hint{display:block!important;font-size:11px;color:#444}
+  body.print-rep .card{box-shadow:none;border:0;background:none;padding:6px 0}
+}
+@media print{body.print-rep #repBody>.card{display:none!important}}
