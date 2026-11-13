@@ -2,8 +2,8 @@
  * Translates exact known strings and short planet/sign/month phrases. Longer generated reading paragraphs stay in English. */
 (function () {
   const DATA = window.I18N_DATA || { dict: {}, gloss: {} }, D = DATA.dict, G = DATA.gloss;
-  const LANGS = [['en', 'English', -1], ['hi', 'हिन्दी', 0], ['bn', 'বাংলা', 1], ['or', 'ଓଡ଼ିଆ', 2]];
-  const IDX = { en: -1, hi: 0, bn: 1, or: 2 };
+  const LANGS = [['en', 'English', -1], ['hi', 'हिन्दी', 0], ['bn', 'বাংলা', 1], ['or', 'ଓଡ଼ିଆ', 2], ['kn', 'ಕನ್ನಡ', 3], ['ml', 'മലയാളം', 4], ['te', 'తెలుగు', 5], ['ta', 'தமிழ்', 6]];
+  const IDX = { en: -1, hi: 0, bn: 1, or: 2, kn: 3, ml: 4, te: 5, ta: 6 };
   const ATTRS = ['placeholder', 'title', 'aria-label'];
   const SKIP = { SCRIPT: 1, STYLE: 1, TEXTAREA: 1, OPTION: 1, NOSCRIPT: 1 };
   let cur = 'en';

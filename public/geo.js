@@ -48,7 +48,7 @@
   }
   async function searchOnline(q, signal) {
     const n = norm(q); if (n.length < 2) return [];
-    const url = 'https://geocoding-api.open-meteo.com/v1/search?count=10&language=' + ({ hi: 'hi', bn: 'bn', or: 'or' }[(window.I18N && window.I18N.lang()) || ''] || 'en') + '&format=json&name=' + encodeURIComponent(q.trim());
+    const url = 'https://geocoding-api.open-meteo.com/v1/search?count=10&language=' + ({ hi: 'hi', bn: 'bn', or: 'or', kn: 'kn', ml: 'ml', te: 'te', ta: 'ta' }[(window.I18N && window.I18N.lang()) || ''] || 'en') + '&format=json&name=' + encodeURIComponent(q.trim());
     const r = await fetch(url, { signal });
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const j = await r.json();
