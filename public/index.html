@@ -29,6 +29,7 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"AstroSarangi","url":"https://astrosarangi.online/","applicationCategory":"LifestyleApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"INR"},"description":"Free Vedic astrology Kundli generator with divisional charts, Vimshottari and Yogini Dasha, Shadbala, Ashtakavarga and transits.","inLanguage":"en"}</script>
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="mobile.css">
 </head>
 <body>
 <header class="top">
@@ -56,6 +57,8 @@
     </div>
     <svg class="wheel" viewBox="0 0 400 400" role="img" aria-label="Decorative zodiac wheel"><defs><radialGradient id="wg" cx="50%" cy="50%" r="50%"><stop offset="0" style="stop-color:var(--deco)" stop-opacity=".2"/><stop offset="1" style="stop-color:var(--deco)" stop-opacity="0"/></radialGradient></defs><circle cx="200" cy="200" r="196" fill="url(#wg)"/><g class="spin" id="wheelSpin"></g><circle cx="200" cy="200" r="64" fill="none" style="stroke:var(--deco)" stroke-opacity=".5"/><circle cx="200" cy="200" r="34" style="fill:var(--deco);stroke:var(--deco)" fill-opacity=".14" stroke-width="1.5"/><path d="M200 168l10 22 22 10-22 10-10 22-10-22-22-10 22-10z" style="fill:var(--deco2)"/></svg>
   </section>
+
+  <section class="card today" id="todayP" aria-label="Today's Panchang"></section>
 
   <section class="card form-card" id="formCard">
     <h2>Birth details</h2>
@@ -168,7 +171,7 @@
     </div>
   </section>
 
-  <section class="sect" id="explore"><h2>Everything for a complete Kundli reading</h2><p class="sub">Create your chart once, then open any tool. Pick a card below; we will take you there as soon as your Kundli is ready.</p><div class="tiles" id="tiles"></div>
+  <section class="sect" id="explore"><h2>Curious about your career, marriage or the year ahead?</h2><p class="sub">Pick a card to read that part of your chart.</p><div class="tiles" id="tiles"></div>
   <p class="alltools"><a class="btn line" href="/free-tools">View all 21 free tools →</a></p></section>
   <section class="sect" id="signs"><h2>The twelve signs</h2><p class="sub">Tap a sign for its element, quality and ruling planet in the Vedic (sidereal) zodiac.</p><div class="zod" id="zod" role="tablist" aria-label="Zodiac signs"></div><div class="card zinfo" id="zinfo" aria-live="polite"></div></section>
   <section class="sect"><h2>How it works</h2><div class="steps3"><div class="card"><span class="n">1</span><b>Enter birth details</b><p class="hint" style="font-size:14px">Date, time and place of birth. Search any city or town, or type coordinates yourself.</p></div><div class="card"><span class="n">2</span><b>Get your Kundli</b><p class="hint" style="font-size:14px">Lagna, Moon sign, nakshatra and every planet, drawn in North, South or East Indian style.</p></div><div class="card"><span class="n">3</span><b>Go deeper</b><p class="hint" style="font-size:14px">Dashas, strengths, transits, KP significators and reports on marriage, career, numerology and the year ahead.</p></div></div></section>
@@ -219,7 +222,9 @@
 <script src="nav.js"></script>
 <script src="pages-map.js"></script>
 <script src="home.js"></script>
+<script src="today.js"></script>
 <script src="i18n-data.js"></script>
 <script src="i18n.js"></script>
+<script src="mobile.js"></script>
 </body>
 </html>

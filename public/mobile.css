@@ -1,0 +1,18 @@
+/* Phone menu: only on screens up to 700px wide. Laptops and tablets keep the normal top menu. */
+.topnav a{font-size:13.333px;font-weight:400;font-family:inherit}
+#mb,.mpanel{display:none}
+@media(max-width:700px){
+  .top .brand{position:relative;padding-right:60px}
+  .topnav{display:none!important}
+  #mb{display:grid;position:absolute;right:12px;top:9px;width:42px;height:42px;place-items:center;border-radius:12px;border:1px solid var(--line);background:rgba(var(--wr),.06);color:var(--accent2);font-size:24px;line-height:1;cursor:pointer;padding:0}
+  .mpanel{position:fixed;left:0;right:0;bottom:0;z-index:60;background:var(--bg,#150a0b);padding:14px 16px 28px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .mpanel[hidden]{display:none}
+  .mpanel.open{display:block}
+  .mpanel a{display:block;padding:13px 10px;border-radius:10px;color:var(--ink);font-size:17px;text-decoration:none}
+  .mpanel a:active{background:rgba(var(--ar),.14)}
+  .mpanel .mcta{background:linear-gradient(180deg,var(--g1),var(--g2));color:var(--on);text-align:center;font-weight:700;margin-bottom:6px}
+  .mpanel h3{margin:18px 10px 4px;font:600 12px/1 inherit;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+  .mpanel label{display:block;margin:20px 10px 0;color:var(--mute);font-size:13px}
+  .mpanel select{width:100%;margin-top:6px;padding:12px;font-size:16px;border-radius:12px;background:var(--card,#241214);color:var(--ink);border:1px solid var(--line)}
+  body.mopen{overflow:hidden}
+}
