@@ -24,6 +24,7 @@ const handler = (req, res) => {
   if (p.includes('\0')) return send(res, 400, 'Bad request');
   if (req.method !== 'GET' && req.method !== 'HEAD') return send(res, 405, 'Method not allowed');
   if (p === '/') p = '/index.html';
+  if (!path.extname(p) && /^\/[a-z0-9-]+$/.test(p)) p += '.html';
   const file = path.normalize(path.join(ROOT, p));
   if (file !== ROOT && !file.startsWith(ROOT + path.sep)) return send(res, 403, 'Forbidden');
   fs.stat(file, (err, st) => {
