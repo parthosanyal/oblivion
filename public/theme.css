@@ -159,3 +159,18 @@ html[lang="hi"] body,html[lang="bn"] body,html[lang="or"] body,html[lang="kn"] b
 
 /* no underlines */
 a,a:hover,a:focus,u{text-decoration:none}
+
+/* home page: after Create Kundli show only the summary; the tiles below open each tool on its own page */
+body:not(.subpage) #result>*:not(#summary){display:none!important}
+/* today's panchang strip (home) */
+.today{max-width:1100px;margin:16px auto 0}
+.today .th{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 16px;margin-bottom:10px}
+.today h2{margin:0;font-size:1.25rem}.today .th p{margin:0;color:var(--mute);font-size:.95rem}
+.today .tg{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
+.today .tg div{background:rgba(var(--ar),.07);border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:4px}
+.today .tg span{font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;color:var(--mute)}
+.today .tg b{font:600 1rem Georgia,serif;color:var(--accent2)}
+.today .hint{margin:10px 0 0}
+@media(max-width:900px){.today .tg{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:560px){.today .tg{grid-template-columns:repeat(2,1fr)}}
+body.has-chart .today{display:none}
