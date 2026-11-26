@@ -27,7 +27,42 @@ const SIGNS = [
   { key: 'pisces', en: 'Pisces', sa: 'Meena', glyph: '♓︎', sym: 'the Two Fish', el: 'Water', q: 'Dual', ruler: 'Jupiter', start: 'Mar 14', end: 'Apr 13', west: 'Aries', westStart: 'Mar 21', body: 'feet and lymphatic system', ex: 'Venus is exalted here, strongest at 27°', deb: 'Mercury is debilitated here, weakest at 15°', mt: '',
     nak: [['Purva Bhadrapada', 'Jupiter', 'pada 4'], ['Uttara Bhadrapada', 'Saturn', 'all 4 padas'], ['Revati', 'Mercury', 'all 4 padas']] }
 ];
-const NEXT = { aries: 'taurus' };
+
+const SGN=['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'];
+const LORDS=['Ketu','Venus','Sun','Moon','Mars','Rahu','Jupiter','Saturn','Mercury'];
+// key, name, deity, symbol, gana, yoni, nadi, type
+const NAKS=[
+['ashwini','Ashwini','Ashwini Kumaras','Horse\'s head','Deva','Horse','Adi (Vata)','Light (Kshipra)'],
+['bharani','Bharani','Yama','Yoni, the womb','Manushya','Elephant','Madhya (Pitta)','Fierce (Ugra)'],
+['krittika','Krittika','Agni','Razor or flame','Rakshasa','Sheep','Antya (Kapha)','Mixed (Mishra)'],
+['rohini','Rohini','Brahma (Prajapati)','Cart or chariot','Manushya','Serpent','Antya (Kapha)','Fixed (Dhruva)'],
+['mrigashira','Mrigashira','Soma','Deer\'s head','Deva','Serpent','Madhya (Pitta)','Soft (Mridu)'],
+['ardra','Ardra','Rudra','Teardrop or diamond','Manushya','Dog','Adi (Vata)','Sharp (Tikshna)'],
+['punarvasu','Punarvasu','Aditi','Quiver of arrows','Deva','Cat','Adi (Vata)','Movable (Chara)'],
+['pushya','Pushya','Brihaspati','Flower or cow\'s udder','Deva','Sheep','Madhya (Pitta)','Light (Kshipra)'],
+['ashlesha','Ashlesha','The Nagas','Coiled serpent','Rakshasa','Cat','Antya (Kapha)','Sharp (Tikshna)'],
+['magha','Magha','The Pitris (ancestors)','Royal throne','Rakshasa','Rat','Antya (Kapha)','Fierce (Ugra)'],
+['purva-phalguni','Purva Phalguni','Bhaga','Front legs of a bed','Manushya','Rat','Madhya (Pitta)','Fierce (Ugra)'],
+['uttara-phalguni','Uttara Phalguni','Aryaman','Back legs of a bed','Manushya','Cow','Adi (Vata)','Fixed (Dhruva)'],
+['hasta','Hasta','Savitar','Open hand','Deva','Buffalo','Adi (Vata)','Light (Kshipra)'],
+['chitra','Chitra','Tvashtar (Vishvakarma)','Bright jewel','Rakshasa','Tiger','Madhya (Pitta)','Soft (Mridu)'],
+['swati','Swati','Vayu','Young shoot in the wind','Deva','Buffalo','Antya (Kapha)','Movable (Chara)'],
+['vishakha','Vishakha','Indra and Agni','Triumphal arch or potter\'s wheel','Rakshasa','Tiger','Antya (Kapha)','Mixed (Mishra)'],
+['anuradha','Anuradha','Mitra','Lotus','Deva','Deer','Madhya (Pitta)','Soft (Mridu)'],
+['jyeshtha','Jyeshtha','Indra','Round amulet or umbrella','Rakshasa','Deer','Adi (Vata)','Sharp (Tikshna)'],
+['mula','Mula','Nirriti','Bunch of tied roots','Rakshasa','Dog','Adi (Vata)','Sharp (Tikshna)'],
+['purva-ashadha','Purva Ashadha','Apas (the waters)','Winnowing fan','Manushya','Monkey','Madhya (Pitta)','Fierce (Ugra)'],
+['uttara-ashadha','Uttara Ashadha','The Vishvedevas','Elephant\'s tusk or bed planks','Manushya','Mongoose','Antya (Kapha)','Fixed (Dhruva)'],
+['shravana','Shravana','Vishnu','Ear or three footprints','Deva','Monkey','Antya (Kapha)','Movable (Chara)'],
+['dhanishta','Dhanishta','The eight Vasus','Drum','Rakshasa','Lion','Madhya (Pitta)','Movable (Chara)'],
+['shatabhisha','Shatabhisha','Varuna','Empty circle','Rakshasa','Horse','Adi (Vata)','Movable (Chara)'],
+['purva-bhadrapada','Purva Bhadrapada','Aja Ekapada','Sword or front of a funeral cot','Manushya','Lion','Adi (Vata)','Fierce (Ugra)'],
+['uttara-bhadrapada','Uttara Bhadrapada','Ahir Budhnya','Back of a funeral cot','Manushya','Cow','Madhya (Pitta)','Fixed (Dhruva)'],
+['revati','Revati','Pushan','Fish or drum','Deva','Elephant','Antya (Kapha)','Soft (Mridu)']
+];
+const dm=d=>{const a=Math.floor(d),m=Math.round((d-a)*60);return a+'° '+(m<10?'0':'')+m+'\u2032'};
+const nslug=k=>k+'-nakshatra';
+
 const slugOf = s => s.key + '-zodiac-sign';
 
 module.exports = function (home, H) {
@@ -103,6 +138,42 @@ ${sections.slice(1).map(x => `<h2>${esc(x[0])}</h2>${para(x[1])}`).join('')}
     urls.push(['/' + slugOf(s), '0.7']);
   });
 
+
+  // ---- nakshatra pages
+  const NC=Object.assign({},require('./learn-nak-1.js'),require('./learn-nak-2.js'),require('./learn-nak-3.js'));
+  const nwords=[];
+  NAKS.forEach((n,i)=>{
+    const [key,name,deity,symbol,gana,yoni,nadi,type]=n,c=NC[key];
+    if(!c)throw new Error('Missing nakshatra '+key);
+    const s0=i*40/3,s1=(i+1)*40/3,lord=LORDS[i%9];
+    const si=Math.floor(s0/30),ei=Math.floor((s1-1e-6)/30);
+    const span=si===ei?SGN[si]:SGN[si]+' and '+SGN[ei];
+    const prev=NAKS[(i+26)%27],next=NAKS[(i+1)%27];
+    const glance=[['Ruling planet (Dasha lord)',lord],['Sidereal span',dm(s0%30)+' '+SGN[si]+' to '+(s1%30===0?'30° 00\u2032 '+SGN[ei]:dm(s1%30)+' '+SGN[ei])],['Deity',deity],['Symbol',symbol],['Gana',gana],['Yoni (animal)',yoni],['Nadi',nadi],['Nature',type]];
+    const rows=[0,1,2,3].map(p=>{const d=s0+p*10/3,sg=Math.floor(d/30);return `<tr><td>${p+1}</td><td>${dm(d%30)} ${SGN[sg]}</td><td>${SGN[(i*4+p)%12]}</td></tr>`}).join('');
+    const faq=c.faq.concat([['What does the Moon in '+name+' mean for the Dasha?','Your first Vimshottari Dasha is that of '+lord+', the lord of '+name+'. How much of it remains at birth depends on how far the Moon has travelled through the nakshatra.']]);
+    const text=[].concat(c.about,c.traits,c.career,c.love,faq.map(f=>f[0]+' '+f[1])).join(' ');
+    nwords.push(name+':'+wc(text));
+    const body=`<article class="card article">
+<div class="glance"><h2>${esc(name)} at a glance</h2><dl>${glance.map(g=>`<div><dt>${esc(g[0])}</dt><dd>${esc(g[1])}</dd></div>`).join('')}</dl></div>
+<h2>About ${esc(name)}</h2>${para([`${name} is nakshatra number ${i+1} of 27 and lies in ${span}. Each nakshatra covers 13 degrees 20 minutes of the zodiac and is divided into four padas of 3 degrees 20 minutes.`].concat(c.about))}
+<h2>The Moon in ${esc(name)}</h2>${para(c.traits)}
+<h2>Career</h2>${para(c.career)}
+<h2>Love and marriage</h2>${para(c.love)}
+<h2>The four padas</h2><p>Each pada falls in a navamsa sign, which refines the nakshatra\'s character. Your pada is found from the exact degree of your Moon.</p>
+<div class="scroll"><table><thead><tr><th>Pada</th><th>Starts at</th><th>Navamsa sign</th></tr></thead><tbody>${rows}</tbody></table></div>
+<h2>Questions about ${esc(name)}</h2>${faq.map(f=>`<details><summary>${esc(f[0])}</summary><p>${esc(f[1])}</p></details>`).join('')}
+<p class="cta-row"><a class="btn gold" href="/birth-chart">Find your Moon nakshatra</a> <a class="btn line" href="/dasha-periods">See your Dasha periods</a></p>
+<p class="small">Written for education and reflection. Astrology describes tendencies, not fixed outcomes, and it is not a substitute for medical, legal or financial advice.</p>
+<nav class="pn" aria-label="More nakshatras"><a href="/${nslug(prev[0])}">← ${esc(prev[1])}</a><a href="/learn">All guides</a><a href="/${nslug(next[0])}">${esc(next[1])} →</a></nav>
+</article>`;
+    const title=`${name} Nakshatra in Vedic Astrology: Traits, Career, Love, Padas | AstroSarangi`;
+    const desc=`${name} nakshatra: ruled by ${lord}, deity ${deity}, in ${span}. Personality, career, love, padas, gana, yoni and nadi explained in plain language.`;
+    write(nslug(key)+'.html',shell({path:'/'+nslug(key),title,desc,h1:`${name} Nakshatra in Vedic Astrology`,lead:c.lead,crumb:`<a href="/">AstroSarangi</a> › <a href="/learn">Learn</a> › ${esc(name)}`,body,
+      ld:[{'@context':'https://schema.org','@graph':[{'@type':'Article',headline:`${name} Nakshatra in Vedic Astrology`,description:desc,url:SITE+'/'+nslug(key),inLanguage:'en',publisher:{'@type':'Organization',name:'AstroSarangi',url:SITE}},{'@type':'FAQPage',mainEntity:faq.map(f=>({'@type':'Question',name:f[0],acceptedAnswer:{'@type':'Answer',text:f[1]}}))}]}]}));
+    urls.push(['/'+nslug(key),'0.7']);
+  });
+
   // ---- hub
   {
     const cards = SIGNS.map(s => `<a class="signcard" href="/${slugOf(s)}"><span class="gl" aria-hidden="true">${s.glyph}</span><b>${esc(s.en)} <small>${esc(s.sa)}</small></b><span>${esc(s.el)} · ${esc(s.q)} · ruled by ${esc(s.ruler)}</span><span class="dt">Sun here about ${esc(s.start)} to ${esc(s.end)}</span></a>`).join('');
@@ -110,10 +181,11 @@ ${sections.slice(1).map(x => `<h2>${esc(x[0])}</h2>${para(x[1])}`).join('')}
 <p>These guides explain each zodiac sign the way Vedic (Jyotish) astrology reads it: by element, quality and ruling planet, and by what it means when the Sun, the Moon or the rising sign falls in it. They use the sidereal zodiac with the Lahiri ayanamsa, the same method the calculators on this site use, so a sign in these pages matches the sign in your chart.</p>
 <p>A sign is only one layer of a chart. Read the sign pages for the character of each sign, then use the free tools to see which signs hold your own Lagna, Moon and planets, and how the Dasha periods time them.</p></section>
 <section class="sect"><h2>The 12 zodiac signs</h2><div class="signgrid">${cards}</div></section>
+<section class="sect"><h2>The 27 nakshatras</h2><div class="signgrid">${NAKS.map((n,i)=>`<a class="signcard" href="/${nslug(n[0])}"><b>${esc(n[1])}</b><span>Ruled by ${LORDS[i%9]} · ${esc(n[2])}</span></a>`).join('')}</div></section>
 <section class="card article"><h2>How these guides are written</h2><p>Each guide is written for AstroSarangi in plain language, based on classical Parashari principles: sign lordship, exaltation and debilitation, moolatrikona, and the nakshatras inside each sign. Astrology describes tendencies and is offered for education and reflection. It does not predict fixed outcomes or replace professional advice. Read more about the site on the <a href="/about">About page</a>.</p><p class="cta-row"><a class="btn gold" href="/birth-chart">Create your free Kundli</a> <a class="btn line" href="/free-tools">All free tools</a></p></section>`;
     write('learn.html', shell({
-      path: '/learn', title: 'Learn Vedic Astrology: The 12 Zodiac Signs Explained | AstroSarangi', desc: 'Plain-language guides to the twelve zodiac signs in Vedic astrology: element, ruling planet, nakshatras, career, love and health tendencies, with free Kundli tools.',
-      h1: 'Learn Vedic Astrology', lead: 'Clear guides to the twelve signs, written for beginners and using the same method as the calculators.',
+      path: '/learn', title: 'Learn Vedic Astrology: Zodiac Signs and Nakshatras Explained | AstroSarangi', desc: 'Plain-language guides to the twelve zodiac signs and 27 nakshatras in Vedic astrology: element, ruling planet, nakshatras, career, love and health tendencies, with free Kundli tools.',
+      h1: 'Learn Vedic Astrology', lead: 'Clear guides to the twelve signs and the 27 nakshatras, written for beginners and using the same method as the calculators.',
       crumb: '<a href="/">AstroSarangi</a> › Learn', body,
       ld: [{ '@context': 'https://schema.org', '@type': 'CollectionPage', name: 'Learn Vedic Astrology', url: SITE + '/learn', inLanguage: 'en' }]
     }));
@@ -133,7 +205,7 @@ ${ABOUT.lists.map(l => `<h2>${esc(l[0])}</h2><ul>${l[1].map(t => '<li>' + esc(t)
     urls.push(['/about', '0.6']);
   }
   const report = SIGNS.map(s => s.key + ':' + CONTENT[s.key]._words).join(' ');
-  console.log('learn pages: ' + (SIGNS.length + 2) + ' | words ' + report);
+  console.log('nak words '+nwords.join(' '));console.log('learn pages: ' + (SIGNS.length + 2 + 27) + ' | words ' + report);
   return urls;
 };
 module.exports.SIGNS = SIGNS;
