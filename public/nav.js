@@ -9,7 +9,7 @@
     ['⏳', 'Predictions', [['Life Predictions', 'tab:predict'], ['Dasha', 'tab:dasha'], ['Transits', 'tab:gochar']]],
     ['💪', 'Strength', [['Shadbala', 'tab:shadbala'], ['Ashtakavarga', 'tab:av'], ['Readings', 'tab:read']]],
     ['🧭', 'KP Astrology', [['Planets & cusps', 'kp:chart'], ['Significators', 'kp:sig'], ['Cuspal sub-lords', 'kp:csl'], ['Dasha & timing', 'kp:dasha'], ['Ruling planets', 'kp:rp'], ['Horary 1–249', 'kp:horary']]],
-    ['📋', 'Reports', [['Kundli analysis', 'sec:kundli'], ['Marriage', 'sec:marriage'], ['Career & finance', 'sec:career'], ['Numerology', 'sec:numerology'], ['Yearly horoscope', 'sec:yearly']]]
+    ['📋', 'Reports', [['Kundli analysis', 'sec:kundli'], ['Marriage', 'sec:marriage'], ['Career & finance', 'sec:career'], ['Numerology', 'sec:numerology'], ['Yearly horoscope', 'sec:yearly'], ['Prashna kundali', 'sec:prashna']]]
   ];
   const r1 = document.createElement('div'), r2 = document.createElement('div'); r1.className = 'sea1'; r2.className = 'sea2'; r1.setAttribute('role', 'tablist'); r1.setAttribute('aria-label', 'Sections'); r2.setAttribute('role', 'tablist'); r2.setAttribute('aria-label', 'Pages');
   tabs.before(r1); r1.after(r2);

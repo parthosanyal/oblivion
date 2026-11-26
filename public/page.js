@@ -15,7 +15,9 @@
     bar.append(t, b); card.before(bar); card.hidden = true;
   }
   document.addEventListener('click', e => { const g = e.target.closest('[data-go=form]'); if (g && card && card.hidden) { card.hidden = false; const bar = document.querySelector('.savedbar'); if (bar) bar.hidden = true; } }, true);
-  document.addEventListener('kundli:ready', () => { setTimeout(() => { if (window.JKNav) window.JKNav.open(v); }, 30); });
+  const unhide = () => document.documentElement.classList.remove('pending');
+  document.addEventListener('kundli:ready', () => { setTimeout(() => { if (window.JKNav) window.JKNav.open(v); unhide(); }, 30); });
+  if (!saved) unhide();
   if (saved) setTimeout(() => {
     const orig = Element.prototype.scrollIntoView; Element.prototype.scrollIntoView = function () {};
     const btn = card && card.querySelector('button[type=submit]');

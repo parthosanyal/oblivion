@@ -34,7 +34,11 @@ const handler = (req, res) => {
       const type = TYPES[path.extname(file)] || 'application/octet-stream';
       const gz = /\bgzip\b/.test(req.headers['accept-encoding'] || '') && /^(text\/|application\/(json|xml|javascript)|image\/svg)/.test(type) && data.length > 1024;
       if (gz) { const k = file + st.mtimeMs; if (!GZ.has(k)) GZ.set(k, zlib.gzipSync(data, { level: 9 })); data = GZ.get(k); }
-      send(res, 200, req.method === 'HEAD' ? '' : data, type, req, gz ? { 'Content-Encoding': 'gzip', 'Vary': 'Accept-Encoding' } : { 'Vary': 'Accept-Encoding' });
+      const etag = 'W/"' + st.size.toString(36) + '-' + Math.floor(st.mtimeMs).toString(36) + '"', asset = /\.(js|css|png|ico|svg|webmanifest)$/.test(file);
+      const hdr = { 'Vary': 'Accept-Encoding', 'ETag': etag, 'Cache-Control': asset ? 'public, max-age=600, stale-while-revalidate=86400' : 'no-cache' };
+      if (req.headers['if-none-match'] === etag) return send(res, 304, '', type, req, hdr);
+      if (gz) hdr['Content-Encoding'] = 'gzip';
+      send(res, 200, req.method === 'HEAD' ? '' : data, type, req, hdr);
     });
   });
 };

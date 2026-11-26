@@ -87,6 +87,14 @@ if (!okRD) fail++;
     ok(Math.abs(((ra - chart.ramc + 540) % 360) - 180 - dsa / 3) < 1e-4 || Math.abs((ra - chart.ramc + 360) % 360 - dsa / 3) < 1e-4, 'kp: cusp 11 is one third of its semi-arc from the MC'); }
   ok(k.analysis.length === 11 && k.periods[0].antars.length === 9 && KP.ruling(chart, 3).list.length === 5, 'kp: analysis, periods and ruling planets built');
   ok(E.CLASSICAL_VARGAS.length === 16, 'vargas: 16 classical charts');
+  // dasha systems and prashna
+  { const D = require('./public/dasha.js'), PR = require('./public/prashna.js'), SV = require('./public/service.js');
+    D.SYSTEMS.forEach(s => { const d = D.build(chart, s.id); ok(d.maha.length > 3 && d.maha.every((m, i) => m.end > m.start && (i === 0 || Math.abs(m.start - d.maha[i - 1].end) < 1) && m.antars.length >= 8), 'dasha: ' + s.id + ' is continuous with sub-periods'); });
+    const v = D.build(chart, 'vimshottari'); ok(v.maha[0].lord === chart.dasha.maha[0].lord && Math.abs(v.maha[0].end - chart.dasha.maha[0].end) < 1000, 'dasha: Vimshottari matches the engine');
+    const tb = D.build(chart, 'tribhagi'); ok(Math.abs(tb.maha[0].years * 3 - v.maha[0].years) < 1e-6 || tb.maha[0].years < v.maha[0].years, 'dasha: Tribhagi is one third of Vimshottari');
+    const b0 = { name: 'T', year: 1992, month: 5, day: 14, hour: 10, minute: 30, lat: 19.07, lon: 72.87, tz: 'Asia/Kolkata' };
+    PR.CAT_LIST.forEach(c => { const r = SV.build({ type: 'prashna', birth: b0, prashna: Object.assign({}, b0, { year: 2026, month: 11, day: 26, hour: 9, minute: 5, category: c.id, text: 'x' }) }, Date.UTC(2026, 10, 26, 3, 35)); ok(r.points.length === 8 && r.prashna.planets.length === 9 && r.meta.pct >= 5 && r.meta.pct <= 95, 'prashna: ' + c.id + ' report built'); });
+    let bad = false; try { SV.build({ type: 'prashna', birth: b0, prashna: { year: 2026 } }); } catch (e) { bad = true; } ok(bad, 'prashna: rejects incomplete details'); }
 }
 console.log(fail ? fail + ' FAILED' : 'all tests passed'); 
 process.exit(fail ? 1 : 0);
