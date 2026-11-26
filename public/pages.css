@@ -28,3 +28,33 @@ html.pending body.subpage[data-page] main{visibility:hidden}
 html.pending body.subpage[data-page]::before{content:'Preparing your chart…';position:fixed;left:0;right:0;top:46vh;text-align:center;font:600 18px system-ui,sans-serif;color:var(--accent);z-index:50}
 html.pending body.subpage[data-page]::after{content:'';position:fixed;left:calc(50% - 16px);top:calc(46vh - 48px);width:28px;height:28px;border:3px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:jkspin .8s linear infinite;z-index:50}
 @keyframes jkspin{to{transform:rotate(360deg)}}
+
+/* ---- Learn articles ---- */
+.article{max-width:860px;margin:0 auto 22px;padding:26px 28px;line-height:1.75}
+.article h2{margin:26px 0 8px;font-size:1.35rem}
+.article h3{margin:14px 0 6px;font-size:1.05rem}
+.article p{margin:0 0 12px}
+.article ul{margin:0 0 12px;padding-left:20px}
+.article li{margin:4px 0}
+.article .two{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:14px 0}
+.article .glance{border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin-bottom:8px;background:var(--input,transparent)}
+.article .glance h2{margin:0 0 8px;font-size:1.1rem}
+.article .glance dl{display:grid;grid-template-columns:repeat(2,1fr);gap:8px 20px;margin:0}
+.article .glance dt{font-size:.74rem;text-transform:uppercase;letter-spacing:.06em;color:var(--mute)}
+.article .glance dd{margin:0;font-weight:600}
+.article .scroll{overflow-x:auto;margin:8px 0 14px}
+.article table{width:100%;border-collapse:collapse}
+.article th,.article td{padding:9px 12px;border-bottom:1px solid var(--line);text-align:left}
+.article details{border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin:8px 0}
+.article summary{cursor:pointer;font-weight:600}
+.article details p{margin:8px 0 2px}
+.article .small{font-size:.82rem;color:var(--mute);margin-top:18px}
+.article .cta-row{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}
+.article .pn{display:flex;justify-content:space-between;gap:10px;margin-top:20px;padding-top:14px;border-top:1px solid var(--line)}
+.signgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.signcard{display:flex;flex-direction:column;gap:4px;padding:16px;border:1px solid var(--line);border-radius:16px;background:var(--card);color:var(--ink);text-decoration:none;transition:transform .15s}
+.signcard:hover{transform:translateY(-2px)}
+.signcard .gl{font-size:1.8rem;color:var(--accent)}
+.signcard small{font-weight:400;color:var(--mute)}
+.signcard span{font-size:.85rem;color:var(--mute)}
+@media(max-width:640px){.article{padding:18px 16px}.article .two,.article .glance dl{grid-template-columns:1fr}}

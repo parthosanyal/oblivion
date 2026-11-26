@@ -8,7 +8,7 @@
   const home = location.pathname === '/' || /index\.html$/.test(location.pathname);
   p.innerHTML = '<a class="mcta" href="' + (home ? '#formCard' : '#formCard') + '" data-go="form">Create Kundli</a><a href="/">Home</a>' +
     groups.map(g => '<h3>' + g[0] + '</h3>' + g[1].map(x => '<a href="' + x.u + '">' + x.n + '</a>').join('')).join('') +
-    '<h3>More</h3><a href="/free-tools">All free tools</a><a href="/contact.html">Contact us</a><label for="mlang">Language</label><select id="mlang"></select>';
+    '<h3>More</h3><a href="/free-tools">All free tools</a><a href="/learn">Learn</a><a href="/about">About us</a><a href="/contact.html">Contact us</a><label for="mlang">Language</label><select id="mlang"></select>';
   brand.appendChild(btn); document.body.appendChild(p);
   const sel = p.querySelector('#mlang');
   if (window.I18N) { sel.innerHTML = window.I18N.langs.map(x => '<option value="' + x[0] + '">' + x[1] + '</option>').join(''); sel.value = window.I18N.lang(); sel.addEventListener('change', () => { window.I18N.set(sel.value); }); }
