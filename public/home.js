@@ -27,6 +27,7 @@
     ['💼', 'Career & finance', 'Work areas, wealth combinations and a ten-year momentum view.', 'sec:career'],
     ['🔢', 'Numerology', 'Pythagorean and Chaldean numbers, Lo Shu grid and lucky details.', 'sec:numerology'],
     ['📅', 'Yearly horoscope', 'Varsha chart, area ratings and month-by-month outlook.', 'sec:yearly'],
+    ['❓', 'Prashna kundali', 'Ask one question: chart for the moment, a reasoned yes or no and timing.', 'sec:prashna'],
     ['📜', 'Panchang & yogas', 'Tithi, nakshatra, yoga, karana, plus yogas and doshas in your chart.', 'tab:panchang']
   ];
   const TAG = {'Birth chart':'Your sky at the moment of birth','Divisional charts':'Sixteen lenses on one life','Life predictions':'See the years ahead','Dasha periods':'The timing of your life','Shadbala & Ashtakavarga':'How strong is each planet','Transits':'The sky right now','KP astrology':'Precise, event-based answers','Marriage matching':'Check compatibility','Career & finance':'Work, wealth and growth','Numerology':'Your name, your numbers','Yearly horoscope':'Your year, month by month','Panchang & yogas':'The almanac of your birth'};

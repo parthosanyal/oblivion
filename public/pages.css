@@ -22,3 +22,9 @@ a.tile{display:flex;text-decoration:none;color:inherit}
 .fexp a{display:block;break-inside:avoid}
 .alltools{text-align:center;margin:18px 0 0}.alltools a{display:inline-block;text-decoration:none}
 body.subpage .tiles{margin-top:12px}
+
+/* loader shown while a section page calculates the saved chart (no half-built template flash) */
+html.pending body.subpage[data-page] main{visibility:hidden}
+html.pending body.subpage[data-page]::before{content:'Preparing your chart…';position:fixed;left:0;right:0;top:46vh;text-align:center;font:600 18px system-ui,sans-serif;color:var(--accent);z-index:50}
+html.pending body.subpage[data-page]::after{content:'';position:fixed;left:calc(50% - 16px);top:calc(46vh - 48px);width:28px;height:28px;border:3px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:jkspin .8s linear infinite;z-index:50}
+@keyframes jkspin{to{transform:rotate(360deg)}}

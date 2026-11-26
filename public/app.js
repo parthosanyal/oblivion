@@ -172,6 +172,19 @@
   $('vargas').addEventListener('click', e => { const g = e.target.closest('.gcard'); if (g) zoom(+g.dataset.n); });
   $('vargas').addEventListener('keydown', e => { const g = e.target.closest('.gcard'); if (g && e.key === 'Enter') zoom(+g.dataset.n); });
   $('zoomClose').addEventListener('click', () => $('zoom').close());
+  let dashaSys = 'vimshottari';
+  function renderDasha(id, now) {
+    const c = chart, D = window.Dasha, d = D.build(c, id);
+    const tabs = D.SYSTEMS.map(x => `<button type="button" class="${x.id === id ? 'on' : ''}" data-dsys="${x.id}" role="tab" aria-selected="${x.id === id}">${x.name}</button>`).join('');
+    const bal = d.balanceYears != null ? `Starting period: <b>${esc(d.first)}</b>, balance at birth about ${d.balanceYears.toFixed(2)} years (year = 365.25 days).` : `Starts from the Lagna sign <b>${esc(d.first)}</b>, counted ${esc(d.direction)}.`;
+    const apply = d.applyNote ? `<p class="hint ${d.applies ? '' : 'warn'}"><b>${d.applies ? 'Applies:' : 'Note:'}</b> ${esc(d.applyNote)}</p>` : '';
+    const rows = d.maha.map(m => {
+      const cur = m.start <= now && now < m.end, lord = id === 'chara' ? ` <small>(${esc(m.lord)})</small>` : '';
+      return `<details class="dasha-row ${cur ? 'now' : ''}" ${cur ? 'open' : ''}><summary><span>${esc(m.label)}${lord} ${id === 'chara' ? 'Dasha' : 'Mahadasha'} ${cur ? '<span class="tag good">running now</span>' : ''}</span><span class="d">${fmtDate(Math.max(m.start, c.utcMs))} → ${fmtDate(m.end)} · ${+m.years.toFixed(2)}y</span></summary><div class="antars">` +
+        m.antars.filter(a => a.end > c.utcMs).map(a => `<div class="${a.start <= now && now < a.end ? 'now' : ''}"><span>${esc(a.label)}</span><span>${fmtDate(Math.max(a.start, c.utcMs))} → ${fmtDate(a.end)}</span></div>`).join('') + `</div></details>`;
+    }).join('');
+    $('dasha').innerHTML = `<h2>Dasha periods</h2><div class="dsys" role="tablist" aria-label="Dasha system">${tabs}</div><p class="hint"><b>${esc(d.name)}.</b> ${esc(d.blurb)}</p><p class="hint">${bal} Click a period for its sub-periods (Antardasha).</p>${apply}${rows}`;
+  }
   function drawCharts() {
     if (!chart) return;
     drawGallery();
@@ -356,12 +369,8 @@
       <p class="hint">Rahu/Ketu are the mean nodes (always retrograde). House = whole-sign house counted from Lagna.</p>`;
 
     const now = Date.now();
-    $('dasha').innerHTML = `<h2>Vimshottari Dasha</h2><p class="hint">Starting Mahadasha: <b>${c.dasha.maha[0].lord}</b> — balance at birth ≈ ${c.dasha.balanceYears.toFixed(2)} years (year = 365.25 days). Click a period for its sub-periods (Antardasha).</p>` +
-      c.dasha.maha.map(m => {
-        const cur = m.start <= now && now < m.end;
-        return `<details class="dasha-row ${cur ? 'now' : ''}" ${cur ? 'open' : ''}><summary><span>${m.lord} Mahadasha ${cur ? '<span class="tag good">running now</span>' : ''}</span><span class="d">${fmtDate(Math.max(m.start, c.utcMs))} → ${fmtDate(m.end)} · ${m.years}y</span></summary><div class="antars">` +
-          m.antars.filter(a => a.end > c.utcMs).map(a => `<div class="${a.start <= now && now < a.end ? 'now' : ''}"><span>${m.lord} – ${a.lord}</span><span>${fmtDate(Math.max(a.start, c.utcMs))} → ${fmtDate(a.end)}</span></div>`).join('') + `</div></details>`;
-      }).join('');
+    renderDasha(dashaSys, now);
+    $('dasha').onclick = e => { const b = e.target.closest('[data-dsys]'); if (b) { dashaSys = b.dataset.dsys; renderDasha(dashaSys, Date.now()); } };
 
     const pc = c.panchang;
     $('panchang').innerHTML = `<h2>Panchang at birth</h2><div class="grid2">${kv('Vara (weekday)', pc.vara)}${kv('Tithi', `${pc.tithi} · ${pc.paksha}`)}${kv('Nakshatra', `${pc.nakshatra} (pada ${pc.pada})`)}${kv('Yoga', pc.yoga)}${kv('Karana', pc.karana)}</div><p class="hint">Weekday is the civil day; in strict Vedic reckoning the day begins at sunrise, so a birth before sunrise belongs to the previous Vara.</p>`;

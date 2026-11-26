@@ -2,11 +2,11 @@
  * Used by the Node server (paid reports) and by the single-file demo build (no payments).
  */
 (function (root, factory) {
-  if (typeof module === 'object' && module.exports) module.exports = factory(require('../public/engine.js'), require('../public/predict.js'), require('./reports.js'), require('./koota.js'), require('./pro.js'));
-  else root.ReportService = factory(root.VedicEngine, root.Predict, root.Reports, root.Koota, root.Pro);
-})(typeof self !== 'undefined' ? self : this, function (E, P, R, K, Pro) {
-  const TYPES = ['kundli', 'marriage', 'career', 'numerology', 'yearly'];
-  const TITLES = { kundli: 'Kundli analysis', marriage: 'Marriage compatibility', career: 'Career and finance', numerology: 'Numerology report', yearly: 'Yearly horoscope' };
+  if (typeof module === 'object' && module.exports) module.exports = factory(require('../public/engine.js'), require('../public/predict.js'), require('./reports.js'), require('./koota.js'), require('./pro.js'), require('./prashna.js'));
+  else root.ReportService = factory(root.VedicEngine, root.Predict, root.Reports, root.Koota, root.Pro, root.Prashna);
+})(typeof self !== 'undefined' ? self : this, function (E, P, R, K, Pro, Pr) {
+  const TYPES = ['kundli', 'marriage', 'career', 'numerology', 'yearly', 'prashna'];
+  const TITLES = { kundli: 'Kundli analysis', marriage: 'Marriage compatibility', career: 'Career and finance', numerology: 'Numerology report', yearly: 'Yearly horoscope', prashna: 'Prashna (horary) reading' };
 
   const num = (v, lo, hi, what, int) => {
     const n = typeof v === 'string' && v.trim() !== '' ? Number(v) : v;
@@ -41,6 +41,11 @@
     if (req.type === 'kundli') rep = Pro.kundli(chart, pred, b);
     else if (req.type === 'career') rep = R.career(chart, pred);
     else if (req.type === 'numerology') rep = R.numerology(b, typeof req.numName === 'string' ? req.numName.replace(/[\u0000-\u001f<>]/g, '').slice(0, 80) : null, new Date(now));
+    else if (req.type === 'prashna') {
+      const qb = cleanBirth(req.prashna || {}), cat = req.prashna && typeof req.prashna.category === 'string' ? req.prashna.category : 'general';
+      const text = req.prashna && typeof req.prashna.text === 'string' ? req.prashna.text.replace(/[\u0000-\u001f<>]/g, '').slice(0, 200) : '';
+      rep = Pr.build(chartOf(qb), chart, cat, text); rep.prashna = rep.meta;
+    }
     else if (req.type === 'yearly') {
       const first = b.year, last = b.year + pred.lifeYears - 1, def = Math.min(b.year + Math.floor(pred.nowAge), last);
       const y = req.year == null ? def : num(req.year, first, last, 'year', true);
@@ -61,6 +66,7 @@
     if (rep.varsha) out.varsha = { lagnaSign: rep.varsha.lagna.sign, planets: rep.varsha.planets.map(p => ({ key: p.key, sign: p.sign, retro: p.retro })) };
     if (req.type === 'yearly') out.meta = { year: rep.year, firstYear: rep.firstYear, lastYear: rep.lastYear, currentYear: rep.currentYear };
     if (req.type === 'marriage') out.meta = { matched: rep.matched };
+    if (req.type === 'prashna') { out.meta = { verdict: rep.meta.verdict, pct: rep.meta.pct }; out.prashna = { lagnaSign: rep.meta.lagnaSign, planets: rep.meta.planets }; }
     return out;
   }
   return { build, cleanBirth, TYPES, TITLES };

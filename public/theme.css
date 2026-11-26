@@ -193,3 +193,33 @@ body:not(.subpage) #result>*:not(#summary){display:none!important}
   body.print-rep .card{box-shadow:none;border:0;background:none;padding:6px 0}
 }
 @media print{body.print-rep #repBody>.card{display:none!important}}
+
+/* ===== Ivory & Gold template (light is the default; dark is a matching ebony and gold mode) ===== */
+h1,h2,h3,.tile b,.hero h2,.logo b,.brand b{font-family:Georgia,'Times New Roman',serif;font-weight:400;letter-spacing:.01em}
+html[data-pal="maroon"]:not([data-mode="dark"]):root{--bg:#fbf7ee;--card:#fffdf8;--ink:#2a2118;--mute:#7b6d5c;--line:#e7dcc6;--accent:#a6781d;--accent2:#7d5a12;--gold:#b8892b;--chart:#fffaf0;--g1:#d4a649;--g2:#a6781d;--on:#fff;--ar:166,120,29;--ar2:184,137,43;--line2:#d8c8a6;--input:#fffdf8;--footbg:#f1e8d6;--hero1:rgba(232,205,150,.45);--bgr:251,247,238;--ok:#2e7d4f;--bad:#b3261e;--shr:120,90,30;--wr:120,90,30}
+html:not([data-mode="dark"]) body{background:var(--bg)}
+html:not([data-mode="dark"]) .hero{background:linear-gradient(135deg,#f6ead0,#fbf7ee 70%);border:1px solid #e1d2b0}
+html:not([data-mode="dark"]) .hero h2{color:#2a2118}html:not([data-mode="dark"]) .hero h2 em{color:#a6781d;font-style:italic}html:not([data-mode="dark"]) .hero p.lead{color:#5b4d3b}
+html:not([data-mode="dark"]) .top{background:rgba(251,247,238,.95);border-bottom:1px solid #e1d2b0}
+html:not([data-mode="dark"]) .btn.gold,html:not([data-mode="dark"]) .topnav .cta,html:not([data-mode="dark"]) button.primary{background:#2a2118;color:#e9c574;border:0;box-shadow:none}
+html:not([data-mode="dark"]) .btn.line{border-color:#cdb98f;color:#2a2118}
+html:not([data-mode="dark"]) .chips span{background:#fff;border-color:#e1d2b0;color:#5b4d3b}
+html:not([data-mode="dark"]) .card,html:not([data-mode="dark"]) .tile{box-shadow:0 1px 0 #efe4cc,0 10px 30px rgba(120,90,30,.08);border-radius:14px;background:var(--card)}
+html:not([data-mode="dark"]) .card h2,html:not([data-mode="dark"]) .sect>h2{color:#2a2118;border-bottom:1px solid #d9c79d;border-image:none;padding-bottom:8px}
+html:not([data-mode="dark"]) .tile b{color:#2a2118}html:not([data-mode="dark"]) .tile .go{color:#a6781d}html:not([data-mode="dark"]) .tile .art{filter:sepia(.35) saturate(.85)}
+html:not([data-mode="dark"]) .logo b,html:not([data-mode="dark"]) .brand b{color:#7d5a12}
+/* dark mode: pure black with glossy black cards, copper accents */
+html[data-pal="maroon"][data-mode="dark"]:root{--bg:#000;--card:#0b0b0d;--ink:#f5f5f2;--mute:#a6a6a6;--line:#242428;--accent:#e0915a;--accent2:#f4c09a;--gold:#e0915a;--chart:#060607;--g1:#f4c09a;--g2:#e0915a;--on:#241100;--ar:224,145,90;--ar2:224,145,90;--line2:#3a3a40;--input:#050506;--footbg:#000;--hero1:rgba(224,145,90,.14);--bgr:0,0,0}
+html[data-mode="dark"] body{background:#000}
+html[data-mode="dark"] .top{background:rgba(0,0,0,.92);border-bottom:1px solid #1d1d21;backdrop-filter:blur(10px)}
+html[data-mode="dark"] .hero,html[data-mode="dark"] .card,html[data-mode="dark"] .tile{position:relative;overflow:hidden;background:linear-gradient(160deg,#1c1c20 0%,#0b0b0d 38%,#050506 100%);border:1px solid #2a2a2f;border-radius:16px;box-shadow:inset 0 1px 0 rgba(255,255,255,.14),inset 0 -1px 0 rgba(0,0,0,.8),0 18px 40px rgba(0,0,0,.9)}
+html[data-mode="dark"] .hero::before,html[data-mode="dark"] .card::before,html[data-mode="dark"] .tile::before{content:'';position:absolute;left:-10%;right:-10%;top:0;height:46%;background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,0));pointer-events:none;border-radius:16px 16px 60% 60%/16px 16px 22px 22px}
+html[data-mode="dark"] .hero h2 em{color:#e0915a;font-style:italic}
+html[data-mode="dark"] .card h2,html[data-mode="dark"] .sect>h2{border-image:linear-gradient(90deg,#e0915a,transparent) 1}
+html[data-mode="dark"] .tile .art{filter:grayscale(.3) contrast(1.1) brightness(.95);border-radius:10px}
+html[data-mode="dark"] .btn.gold,html[data-mode="dark"] .topnav .cta,html[data-mode="dark"] button.primary{background:linear-gradient(180deg,#f4c09a,#e0915a);color:#241100;box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 6px 18px rgba(224,145,90,.25)}
+html[data-mode="dark"] .btn,html[data-mode="dark"] button{border-radius:10px}
+html[data-mode="dark"] .modebtn,html[data-mode="dark"] .dsys button,html[data-mode="dark"] .chips span{border-radius:999px}
+/* light/dark switch */
+.modebtn{border:1px solid var(--line2);background:transparent;color:var(--ink);border-radius:999px;width:38px;height:38px;cursor:pointer;font-size:17px;line-height:1;display:inline-grid;place-items:center;margin-left:6px}
+.modebtn:hover{border-color:var(--accent);color:var(--accent)}
